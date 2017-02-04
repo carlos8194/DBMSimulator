@@ -1,7 +1,7 @@
 package connection;
 
 /**
- * Created by Carlos on 03/02/2017.
+ * Created by Carlos  y Rodrigo on 03/02/2017.
  */
 public class Connection {
     private Statement state;
