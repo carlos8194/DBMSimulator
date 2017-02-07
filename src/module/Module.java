@@ -12,7 +12,7 @@ public abstract class Module {
     protected Module next;
 
     public abstract void receiveConnection(Connection connection, double time);
-    public abstract void endConnection();
+    public abstract void endConnection(Connection connection, double time);
 
 
     protected class ModuleStatistics {

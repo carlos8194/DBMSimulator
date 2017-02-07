@@ -1,9 +1,9 @@
 package connection;
 
 /**
- * Created by Carlos  y Rodrigo on 03/02/2017.
+ * Created by Carlos and Rodrigo on 03/02/2017.
  */
-public class Connection {
+public class Connection implements Comparable<Connection> {
     private Statement state;
     private double lifeTime;
     private boolean readOnly;
@@ -49,6 +49,12 @@ public class Connection {
     public ConnectionStatistics getStatistics(){
         return statistics;
     }
+
+    public int compareTo(Connection connection){
+        return state.compareTo(connection.state);
+    }
+
+
 
 
 
