@@ -1,7 +1,8 @@
 package module;
 
-import connection.*;
+import query.*;
 import event.*;
+import utils.ProbabilityDistributions;
 
 
 
@@ -20,12 +21,15 @@ public class ClientAdministrator extends Module {
         discardedConnections = 0;
     }
 
-    public void receiveConnection(Connection connection, double time){
-        System.out.println("Connection entered Client Administrator module");
-        ConnectionStatistics connectionStatistics = connection.getStatistics();
-        connectionStatistics.TimeModule1 = time;
+    public void processArrival(Query query){
+        /*
+        Lo comente por que borre time como parametro de este metodo.
+
+        System.out.println("Query entered Client Administrator module");
+        QueryStatistics queryStatistics = query.getStatistics();
+        queryStatistics.TimeModule1 = time;
         if (k > 0){
-            connectionStatistics.entryTimeModule1 = time;
+            queryStatistics.entryTimeModule1 = time;
             double duration = ProbabilityDistributions.Uniform(0.01, 0.05);
             Event event = new Event(EventType.MODULE_END, time + duration);
 
@@ -33,12 +37,12 @@ public class ClientAdministrator extends Module {
         }
         else {
             discardedConnections++;
-        }
+        }*/
     }
 
-    public void endConnection(Connection connection, double time){
+    public void processExit(Query query){
         System.out.println("Conecction exited Client Administrator module");
-        next.receiveConnection(connection,time);
+        next.processArrival(query);
     }
 
 

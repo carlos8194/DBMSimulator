@@ -1,18 +1,19 @@
 package module;
 
-import connection.Connection;
-import event.Event;
+import query.Query;
+import dbms.DBMS;
 
 /**
  * Created by Carlos on 03/02/2017.
  */
 public abstract class Module {
+    protected DBMS DBMS;
     protected ModuleStatistics statistics;
     protected int moduleNumber;
     protected Module next;
 
-    public abstract void receiveConnection(Connection connection, double time);
-    public abstract void endConnection(Connection connection, double time);
+    public abstract void processArrival(Query query);
+    public abstract void processExit(Query query);
 
 
     protected class ModuleStatistics {

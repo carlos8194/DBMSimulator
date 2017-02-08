@@ -1,18 +1,18 @@
 package module;
 
-import connection.Connection;
+import query.Query;
 
 /**
  * Created by Rodrigo on 2/7/2017.
  */
 public class QueryExecutor extends Module {
     @Override
-    public void receiveConnection(Connection connection, double time) {
+    public void processArrival(Query query) {
 
     }
 
     @Override
-    public void endConnection(Connection connection, double time) {
+    public void processExit(Query query) {
 
     }
 }
