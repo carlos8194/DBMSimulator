@@ -8,14 +8,29 @@ public class Event implements Comparable<Event> {
     private double time;
 
     public Event(EventType type, double time){
-        this.time = time;
-        this.type = type;
+        this.setTime(time);
+        this.setType(type);
     }
 
     public int compareTo(Event event){
-        double comparison = time - event.time;
+        double comparison = getTime() - event.getTime();
         return (comparison >= 0) ? 1 : -1;
     }
 
 
+    public EventType getType() {
+        return type;
+    }
+
+    public void setType(EventType type) {
+        this.type = type;
+    }
+
+    public double getTime() {
+        return time;
+    }
+
+    public void setTime(double time) {
+        this.time = time;
+    }
 }

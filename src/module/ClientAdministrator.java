@@ -1,9 +1,6 @@
 package module;
 
 import query.*;
-import event.*;
-import utils.ProbabilityDistributions;
-
 
 
 /**
@@ -14,10 +11,9 @@ public class ClientAdministrator extends Module {
     private int k;
     private int discardedConnections;
 
-    public ClientAdministrator(int maxConnections, Module next){
-        k = maxConnections;
-        moduleNumber = 1;
-        this.next = next;
+    public ClientAdministrator(int concurrentConnections, Module next){
+        k = concurrentConnections;
+        this.nextModule = next;
         discardedConnections = 0;
     }
 
@@ -42,8 +38,10 @@ public class ClientAdministrator extends Module {
 
     public void processExit(Query query){
         System.out.println("Conecction exited Client Administrator module");
-        next.processArrival(query);
+        nextModule.processArrival(query);
     }
+
+    public void returnQueryResult(){}
 
 
 }
