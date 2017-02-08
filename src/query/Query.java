@@ -1,43 +1,47 @@
 package query;
 
+import module.Module;
+
 /**
  * Created by Carlos and Rodrigo on 03/02/2017.
  */
 public class Query implements Comparable<Query> {
+    //Es necesario que sea comparable? no se comparan solo eventos?
+    private int queryID;
+    private Module currentModule;
+    private boolean currentlyInQueue;
     private QueryType queryType;
     private QueryStatistics statistics;
 
     public Query(double t){
         double random = Math.random();
         if (random < 0.32){
-            queryType = QueryType.SELECT;
+            setQueryType(QueryType.SELECT);
         }
         else if (random < 0.6){
-            queryType = QueryType.UPDATE;
+            setQueryType(QueryType.UPDATE);
         }
         else if (random < 0.93){
-            queryType = QueryType.JOIN;
+            setQueryType(QueryType.JOIN);
         }
         else {
-            queryType = QueryType.DDL;
+            setQueryType(QueryType.DDL);
 
         }
     }
 
-    public QueryType getQueryType(){
+
+
+    public int compareTo(Query query){
+        return getQueryType().compareTo(query.getQueryType());
+    }
+
+
+    public QueryType getQueryType() {
         return queryType;
     }
 
-    public QueryStatistics getStatistics(){
-        return statistics;
+    public void setQueryType(QueryType queryType) {
+        this.queryType = queryType;
     }
-
-    public int compareTo(Query query){
-        return queryType.compareTo(query.getQueryType());
-    }
-
-
-
-
-
 }
