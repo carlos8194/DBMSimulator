@@ -1,4 +1,4 @@
-package module;
+package utils;
 
 /**
  * Created by Carlos on 01/02/2017.
