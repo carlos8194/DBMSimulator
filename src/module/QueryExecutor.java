@@ -22,10 +22,15 @@ public class QueryExecutor extends Module {
     public void processExit(Query query) {
         System.out.println("Conecction " + query.getID() + " exited Query Executor module");
         QueryStatistics queryStatistics = query.getStatistics();
-        queryStatistics.exitTimeModule5 = DBMS.clock;
+        queryStatistics.setExitTimeModule5(DBMS.getClock());
         if (!query.isTimeOut() ) {
             ClientAdministrator module1 = (ClientAdministrator) nextModule;
             module1.returnQueryResult(query, 0); // cambiar el 0 por el numero de bloques
         }
+    }
+
+    @Override
+    public void queryTimeout(Query query) {
+
     }
 }

@@ -7,7 +7,6 @@ import module.Module;
  */
 public class Query implements Comparable<Query> {
     private static int queryNumber = 1;
-
     private int queryID;
     private Module currentModule;
     private boolean currentlyInQueue;

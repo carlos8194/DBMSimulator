@@ -16,13 +16,14 @@ public abstract class Module {
 
     public abstract void processArrival(Query query);
     public abstract void processExit(Query query);
+    public abstract void queryTimeout(Query query);
 
 
 
     /**
      * Created by Carlos on 2/8/2017.
      */
-    public static class ModuleStatistics {
+    public class ModuleStatistics {
         protected int queueClients;
         protected double queueTime;
         protected double idleTime;

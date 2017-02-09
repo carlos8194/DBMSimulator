@@ -21,16 +21,16 @@ public class ClientAdministrator extends Module {
 
     @Override
     public void processArrival(Query query){
-        double time = DBMS.clock;
-        System.out.println("Conecction " + query.getID() + " entered Query Executor module");
+        double time = DBMS.getClock();
+        System.out.println("Conecction " + query.getID() + " entered Client Administrator module");
         QueryStatistics queryStatistics = query.getStatistics();
-        queryStatistics.TimeModule1 = time;
+        queryStatistics.setTimeModule1(time);
         if (k > 0){
-            queryStatistics.entryTimeModule1 = time;
+            queryStatistics.setEntryTimeModule1(time);
             double duration = ProbabilityDistributions.Uniform(0.01, 0.05);
             Event event = new Event(EventType.MODULE_END, time + duration, query);
             DBMS.addEvent(event);
-            k++;
+            k--;
         }
         else {
             discardedConnections++;
@@ -38,20 +38,22 @@ public class ClientAdministrator extends Module {
     }
 
     public void processExit(Query query) {
-        System.out.println("Conecction " + query.getID() + " exited Query Executor module");
+        System.out.println("Conecction " + query.getID() + " exited Client Administrator module");
         if (! query.isTimeOut() ) {
             nextModule.processArrival(query);
         }
+
         QueryStatistics queryStatistics = query.getStatistics();
-        queryStatistics.exitTimeModule1 = DBMS.clock;
+        queryStatistics.setExitTimeModule1(DBMS.getClock());
     }
 
     void returnQueryResult(Query query, int B){
-        double time = DBMS.clock + (double) B/6;
+        double time = DBMS.getClock() + (double) B/6;
         Event event = new Event(EventType.QUERY_RETURN, time, query);
         DBMS.addEvent(event);
-        k--;
+        k++;
     }
 
-
+    @Override
+    public void queryTimeout(Query query) {}
 }

@@ -11,7 +11,7 @@ import java.util.PriorityQueue;
  */
 public class DBMS {
     //DBMS variables
-    public double clock;
+    private double clock;
 
     //Simulation Statistics
     DBMSStatistics dbmsStatistics;
@@ -52,12 +52,12 @@ public class DBMS {
     public DBMSStatistics runSimultation(){
         //Initialize system
         initializeDBMS();
-        clock = 0.0;
+        clock = 0;
         Event firstArrival = new Event(EventType.NEW_QUERY, ProbabilityDistributions.Exponential(35) );
         eventList.add(firstArrival);
 
         //Run simulation
-        while(clock<totalRunningTime){
+        while(getClock() <totalRunningTime){
             //Get nextModule event
             Event currentEvent = eventList.poll();
             //Move clock to event time
@@ -86,6 +86,7 @@ public class DBMS {
     }
 
     private void processQueryTimeout() {
+
     }
 
     private void processQueryReturn() {
@@ -95,6 +96,11 @@ public class DBMS {
     }
 
     private void processNewQuery() {
+    }
+
+
+    public double getClock() {
+        return clock;
     }
 
 

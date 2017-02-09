@@ -7,4 +7,5 @@ public class Interface {
     private int iterations;
     private boolean delay;
     private double delayTime;
+
 }
