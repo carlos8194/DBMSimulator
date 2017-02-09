@@ -26,7 +26,7 @@ public class DBMS {
     private QueryExecutor queryExecutor;
 
     //DBMS parameters
-    double totalRunningTime;
+    private double totalRunningTime;
     private int concurrentConnections;//Module 1: ClientAdministrator k
     private int availableProcesses;//Module 3: QueryProccesor n
     private int simultaneousConsultations;//Module 4: TranasactionalStorageManager p
@@ -36,7 +36,7 @@ public class DBMS {
 
 
     public DBMS(int time,int k, int n, int p, int m, double t){
-        //DBms parameters
+        //DBMs parameters
         totalRunningTime = time;
         concurrentConnections = k;
         availableProcesses = n;
@@ -53,7 +53,7 @@ public class DBMS {
         //Initialize system
         initializeDBMS();
         clock = 0.0;
-        Event firstArrival = new Event(EventType.NEW_QUERY, ProbabilityDistributions.Exponential(35));
+        Event firstArrival = new Event(EventType.NEW_QUERY, ProbabilityDistributions.Exponential(35) );
         eventList.add(firstArrival);
 
         //Run simulation
@@ -68,7 +68,6 @@ public class DBMS {
                 case MODULE_END: processModuleEnd();
                 case QUERY_RETURN: processQueryReturn();
                 case QUERY_TIMEOUT: processQueryTimeout();
-
             }
         }
         return dbmsStatistics;
@@ -79,11 +78,11 @@ public class DBMS {
         dbmsStatistics = new DBMSStatistics();
         eventList= new PriorityQueue<>(Event::compareTo);
         //Modules
-        clientAdministrator = new ClientAdministrator(concurrentConnections,processManager);
+        clientAdministrator = new ClientAdministrator(concurrentConnections, processManager);
         processManager = new ProcessManager(queryProcessor);
         queryProcessor = new QueryProcessor(availableProcesses,transactionalStorageManager);
-        transactionalStorageManager = new TransactionalStorageManager(simultaneousConsultations,queryExecutor);
-        queryExecutor = new QueryExecutor(parallelStatements,clientAdministrator);
+        transactionalStorageManager = new TransactionalStorageManager(simultaneousConsultations, queryExecutor);
+        queryExecutor = new QueryExecutor(parallelStatements, clientAdministrator);
     }
 
     private void processQueryTimeout() {

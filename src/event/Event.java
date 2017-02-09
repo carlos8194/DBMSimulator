@@ -1,11 +1,20 @@
 package event;
 
+import query.Query;
+
 /**
  * Created by Carlos on 03/02/2017.
  */
 public class Event implements Comparable<Event> {
     private EventType type;
     private double time;
+    private Query query;
+
+    public Event(EventType type, double time, Query query){
+        this.setTime(time);
+        this.setType(type);
+        this.query = query;
+    }
 
     public Event(EventType type, double time){
         this.setTime(time);

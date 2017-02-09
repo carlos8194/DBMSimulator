@@ -15,14 +15,8 @@ public abstract class Module {
     protected Queue<Query> queue;
 
     public abstract void processArrival(Query query);
+    public abstract void processExit(Query query);
 
-    public void processExit(Query query){
-        double time = DBMS.clock;
-        System.out.println("Conecction exited Client Administrator module");
-        if ( !query.isTimeOut() ) {
-            nextModule.processArrival(query);
-        }
-    }
 
 
     /**

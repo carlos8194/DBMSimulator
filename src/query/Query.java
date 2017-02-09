@@ -43,6 +43,9 @@ public class Query implements Comparable<Query> {
         return getQueryType().compareTo(query.getQueryType());
     }
 
+    public int getID(){
+        return queryID;
+    }
 
     public QueryType getQueryType() {
         return queryType;

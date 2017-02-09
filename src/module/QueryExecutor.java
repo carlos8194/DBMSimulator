@@ -1,6 +1,7 @@
 package module;
 
 import query.Query;
+import query.QueryStatistics;
 
 /**
  * Created by Rodrigo on 2/7/2017.
@@ -19,7 +20,12 @@ public class QueryExecutor extends Module {
 
     @Override
     public void processExit(Query query) {
-        super.processExit(query);
-
+        System.out.println("Conecction " + query.getID() + " exited Query Executor module");
+        QueryStatistics queryStatistics = query.getStatistics();
+        queryStatistics.exitTimeModule5 = DBMS.clock;
+        if (!query.isTimeOut() ) {
+            ClientAdministrator module1 = (ClientAdministrator) nextModule;
+            module1.returnQueryResult(query, 0); // cambiar el 0 por el numero de bloques
+        }
     }
 }

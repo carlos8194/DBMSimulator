@@ -4,7 +4,7 @@ package query;
  * Created by Carlos on 03/02/2017.
  */
 public class QueryStatistics {
-    public double systemArrivalTime;
+    public double systemArrivalTime; // ???
     public double systemExitTime;
     public double entryTimeModule1;// when we finally got attended
     public double exitTimeModule1;
