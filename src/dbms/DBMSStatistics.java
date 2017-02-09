@@ -1,6 +1,6 @@
 package dbms;
 
-import module.ModuleStatistics;
+import module.Module;
 
 /**
  * Created by Rodrigo on 2/4/2017.
@@ -64,11 +64,11 @@ public class DBMSStatistics {
     double idleTimeModule5;
 
     //8.Module Statistics.
-    ModuleStatistics module1Statistics;
-    ModuleStatistics module2Statistics;
-    ModuleStatistics module3Statistics;
-    ModuleStatistics module4Statistics;
-    ModuleStatistics module5Statistics;
+    Module.ModuleStatistics module1Statistics;
+    Module.ModuleStatistics module2Statistics;
+    Module.ModuleStatistics module3Statistics;
+    Module.ModuleStatistics module4Statistics;
+    Module.ModuleStatistics module5Statistics;
 
 
 }

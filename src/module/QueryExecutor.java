@@ -19,6 +19,7 @@ public class QueryExecutor extends Module {
 
     @Override
     public void processExit(Query query) {
+        super.processExit(query);
 
     }
 }

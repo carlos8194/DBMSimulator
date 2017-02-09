@@ -11,7 +11,7 @@ import java.util.PriorityQueue;
  */
 public class DBMS {
     //DBMS variables
-    double clock;
+    public double clock;
 
     //Simulation Statistics
     DBMSStatistics dbmsStatistics;

@@ -11,7 +11,7 @@ public enum QueryType {
 
     public boolean readOnly;
 
-    private QueryType(boolean readOnly){
+    QueryType(boolean readOnly){
         this.readOnly = readOnly;
     }
 

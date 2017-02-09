@@ -1,9 +1,8 @@
 package module;
 
-import query.Query;
+import query.*;
 import dbms.DBMS;
 
-import java.util.PriorityQueue;
 import java.util.Queue;
 
 /**
@@ -16,8 +15,34 @@ public abstract class Module {
     protected Queue<Query> queue;
 
     public abstract void processArrival(Query query);
-    public abstract void processExit(Query query);
+
+    public void processExit(Query query){
+        double time = DBMS.clock;
+        System.out.println("Conecction exited Client Administrator module");
+        if ( !query.isTimeOut() ) {
+            nextModule.processArrival(query);
+        }
+    }
 
 
+    /**
+     * Created by Carlos on 2/8/2017.
+     */
+    public static class ModuleStatistics {
+        protected int queueClients;
+        protected double queueTime;
+        protected double idleTime;
+        protected double timeService;
+        protected int clientsService;
+        protected int totalClients;
 
+        public ModuleStatistics(){
+            queueClients = 0;
+            queueTime = 0;
+            idleTime = 0;
+            timeService = 0;
+            clientsService = 0;
+            totalClients = 0;
+        }
+    }
 }
