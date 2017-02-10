@@ -21,4 +21,8 @@ public  class QueryProcessor extends Module {
     public void processExit(Query query) {
 
     }
+    @Override
+    public void queryTimeout(Query query) {
+
+    }
 }

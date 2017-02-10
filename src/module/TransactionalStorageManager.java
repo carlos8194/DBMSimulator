@@ -8,6 +8,8 @@ import query.Query;
 public class TransactionalStorageManager extends Module {
     private int simultaneousConsultations;
 
+
+
     public TransactionalStorageManager(int p, Module next){
         simultaneousConsultations = p;
         nextModule = next;
@@ -20,6 +22,10 @@ public class TransactionalStorageManager extends Module {
 
     @Override
     public void processExit(Query query) {
+
+    }
+    @Override
+    public void queryTimeout(Query query) {
 
     }
 }

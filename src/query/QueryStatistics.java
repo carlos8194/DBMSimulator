@@ -6,9 +6,9 @@ package query;
 public class QueryStatistics {
     private double systemArrivalTime; // ???
     private double systemExitTime;
-    private double entryTimeModule1;// when we finally got attended
+    private double entryTimeModule1;
     private double exitTimeModule1;
-    private double TimeModule1; // arrival time
+    private double TimeModule1;
     private double entryTimeModule2;
     private double exitTimeModule2;
     private double TimeModule2;
