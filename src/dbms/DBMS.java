@@ -89,10 +89,11 @@ public class DBMS {
 
     private void processQueryTimeout(Query query) {
         query.getCurrentModule().queryTimeout(query);
+        clientAdministrator.freeConnection();
     }
 
     private void processQueryReturn(Query query) {
-        //No sé que hacer aquí
+        query.getStatistics().setSystemExitTime(clock);
     }
 
     private void processModuleEnd(Query query) {
@@ -101,6 +102,7 @@ public class DBMS {
 
     private void processNewQuery() {
         Query query = new Query();
+        query.getStatistics().setSystemArrivalTime(clock);
         Event queryTimeOut = new Event(EventType.QUERY_TIMEOUT, queryTimeoutTime, query);
         Event nextArrival = new Event(EventType.NEW_QUERY, ProbabilityDistributions.Exponential(35) );
         eventList.add(nextArrival);

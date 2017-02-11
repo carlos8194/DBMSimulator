@@ -60,4 +60,8 @@ public class ClientAdministrator extends Module {
         DBMS.addEvent(event);
         servers--;
     }
+
+    public void freeConnection(){
+        servers++;
+    }
 }

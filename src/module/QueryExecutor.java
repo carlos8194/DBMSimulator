@@ -19,15 +19,24 @@ public class QueryExecutor extends Module {
     }
     @Override
     public void processArrival(Query query) {
-
+        double time = DBMS.getClock();
+        System.out.println("Conecction " + query.getID() + " entered Query Executor module");
+        QueryStatistics queryStatistics = query.getStatistics();
+        queryStatistics.setTimeModule5(time);
+        if (servers > 0){
+            this.attendQuery(query);
+        }
+        else {
+            queue.add(query);
+        }
     }
 
     @Override
     public void processExit(Query query) {
         System.out.println("Conecction " + query.getID() + " exited Query Executor module");
         QueryStatistics queryStatistics = query.getStatistics();
-        double time = DBMS.getClock();
-        queryStatistics.setExitTimeModule5(time);
+        queryStatistics.setExitTimeModule5( DBMS.getClock() );
+        servers++;
         if ( !query.isTimeOut() ){
             administrator.returnQueryResult(query);
         }
@@ -35,6 +44,28 @@ public class QueryExecutor extends Module {
 
     @Override
     protected void attendQuery(Query query) {
+        double time = DBMS.getClock();
+        double duration = this.calculateDuration(query);
+        QueryStatistics queryStatistics = query.getStatistics();
+        queryStatistics.setEntryTimeModule5(time);
+        Event event = new Event(EventType.MODULE_END, time + duration, query);
+        DBMS.addEvent(event);
+        servers--;
+    }
 
+    private double calculateDuration(Query query){
+        double duration;
+        switch ( query.getQueryType() ){
+            case DDL:
+                duration = 0.5;
+                break;
+            case UPDATE:
+                duration = 1;
+                break;
+            default:
+                duration = Math.pow(query.getBlocks(), 2);
+                break;
+        }
+        return duration;
     }
 }
