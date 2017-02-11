@@ -7,14 +7,16 @@ import module.Module;
  */
 public class Query implements Comparable<Query> {
     private static int queryNumber = 1;
+
     private int queryID;
     private Module currentModule;
     private boolean currentlyInQueue;
     private QueryType queryType;
     private QueryStatistics statistics;
     private boolean timeOut;
+    private int blocks;
 
-    public Query(double t){
+    public Query(){
         double random = Math.random();
         if (random < 0.32){
             setQueryType(QueryType.SELECT);
@@ -66,6 +68,10 @@ public class Query implements Comparable<Query> {
         this.timeOut = timeOut;
     }
 
+    public boolean isCurrentlyInQueue(){
+        return currentlyInQueue;
+    }
+
     public void setCurrentModule(Module module){
         currentModule = module;
     }
@@ -75,18 +81,19 @@ public class Query implements Comparable<Query> {
     }
 
     public boolean equals(Object o){
-        boolean comparison;
-        if (! (o instanceof Query) ){
-            comparison = false;
-        }
-        else {
-            Query query = (Query) o;
-            comparison = (queryID == query.queryID);
-        }
-        return comparison;
+        return queryID == o.hashCode();
     }
 
     public int hashCode(){
         return queryID;
+    }
+
+
+    public int getBlocks() {
+        return blocks;
+    }
+
+    public void setBlocks(int blocks) {
+        this.blocks = blocks;
     }
 }

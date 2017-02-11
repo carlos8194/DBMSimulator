@@ -2,6 +2,7 @@ package dbms;
 import event.Event;
 import event.EventType;
 import module.*;
+import query.Query;
 import utils.ProbabilityDistributions;
 
 import java.util.PriorityQueue;
@@ -63,11 +64,12 @@ public class DBMS {
             //Move clock to event time
             clock = currentEvent.getTime();
             //Process Event
+            Query query = currentEvent.getQuery();
             switch(currentEvent.getType()){
                 case NEW_QUERY: processNewQuery();
-                case MODULE_END: processModuleEnd();
-                case QUERY_RETURN: processQueryReturn();
-                case QUERY_TIMEOUT: processQueryTimeout();
+                case MODULE_END: processModuleEnd(query);
+                case QUERY_RETURN: processQueryReturn(query);
+                case QUERY_TIMEOUT: processQueryTimeout(query);
             }
         }
         return dbmsStatistics;
@@ -85,23 +87,29 @@ public class DBMS {
         queryExecutor = new QueryExecutor(parallelStatements, clientAdministrator);
     }
 
-    private void processQueryTimeout() {
-
+    private void processQueryTimeout(Query query) {
+        query.getCurrentModule().queryTimeout(query);
     }
 
-    private void processQueryReturn() {
+    private void processQueryReturn(Query query) {
+        //No sé que hacer aquí
     }
 
-    private void processModuleEnd() {
+    private void processModuleEnd(Query query) {
+        query.getCurrentModule().processExit(query);
     }
 
     private void processNewQuery() {
+        Query query = new Query();
+        Event queryTimeOut = new Event(EventType.QUERY_TIMEOUT, queryTimeoutTime, query);
+        Event nextArrival = new Event(EventType.NEW_QUERY, ProbabilityDistributions.Exponential(35) );
+        eventList.add(nextArrival);
+        eventList.add(queryTimeOut);
+        clientAdministrator.processArrival(query);
     }
-
 
     public double getClock() {
         return clock;
     }
-
-
+    
 }

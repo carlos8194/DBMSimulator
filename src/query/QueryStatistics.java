@@ -14,7 +14,7 @@ public class QueryStatistics {
     private double TimeModule2;
     private double entryTimeModule3;
     private double exitTimeModule3;
-    private double TimeModule13;
+    private double TimeModule3;
     private double entryTimeModule4;
     private double exitTimeModule4;
     private double TimeModule4;
@@ -102,12 +102,12 @@ public class QueryStatistics {
         this.exitTimeModule3 = exitTimeModule3;
     }
 
-    public double getTimeModule13() {
-        return TimeModule13;
+    public double getTimeModule3() {
+        return TimeModule3;
     }
 
-    public void setTimeModule13(double timeModule13) {
-        TimeModule13 = timeModule13;
+    public void setTimeModule3(double timeModule3) {
+        TimeModule3 = timeModule3;
     }
 
     public double getEntryTimeModule4() {

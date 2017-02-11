@@ -11,11 +11,22 @@ import java.util.Queue;
 public abstract class Module {
     protected DBMS DBMS;
     protected ModuleStatistics statistics;
+    protected int servers;
     protected Module nextModule;
     protected Queue<Query> queue;
 
     public abstract void processArrival(Query query);
     public abstract void processExit(Query query);
-    public abstract void queryTimeout(Query query);
+    protected abstract void attendQuery(Query query);
+
+
+    public  void queryTimeout(Query query){
+        if (query.isCurrentlyInQueue() ){
+            queue.remove(query);
+        }
+        else {
+            query.setTimeOut(true);
+        }
+    }
 
 }
