@@ -93,10 +93,12 @@ public class DBMS {
     }
 
     private void processQueryReturn(Query query) {
+
         query.getStatistics().setSystemExitTime(clock);
     }
 
     private void processModuleEnd(Query query) {
+
         query.getCurrentModule().processExit(query);
     }
 

@@ -34,7 +34,7 @@ public class Query implements Comparable<Query> {
         timeOut = false;
         queryID = queryNumber;
         queryNumber++;
-        statistics = new QueryStatistics();
+        statistics = new QueryStatistics(this);
         currentlyInQueue = false;
     }
 
@@ -95,5 +95,9 @@ public class Query implements Comparable<Query> {
 
     public void setBlocks(int blocks) {
         this.blocks = blocks;
+    }
+
+    public void setCurrentlyInQueue(boolean currentlyInQueue) {
+        this.currentlyInQueue = currentlyInQueue;
     }
 }

@@ -8,7 +8,9 @@ public class ModuleStatistics {
 
     //Performance Measures.
     private double averageSystemSize;// L = Lq + Ls
+    private double accumulatedQueueSize;// Used for calculating Lq
     private double averageQueueSize;// Lq
+    private double accumulatedServiceSize;// Used for calculating Ls
     private double averageServiceSize;// Ls
 
     private double averageResponseTime;// W= Wq + Ws
@@ -20,17 +22,21 @@ public class ModuleStatistics {
     private double arrivalRate;// lambda: λ
     private double serviceRate;// mu: μ
 
-    private double lastEventTime;
+    private double queueSizeChangeTime;
+    private double serviceSizeChangeTime;
     private double idleTime;
 
     //Current Server State.
     private int currentQueueSize;
+    private double totalQueueTime;
     private int currentServiceSize;
+    private double totalServiceTime;
+    private int numberOfArrivals;
     private int queriesProcessed;
 
     public ModuleStatistics(Module module){
-        this.setModule(module);
 
+        this.setModule(module);
     }
 
     public Module getModule() {
@@ -49,20 +55,20 @@ public class ModuleStatistics {
         this.averageSystemSize = averageSystemSize;
     }
 
-    public double getAverageQueueSize() {
-        return averageQueueSize;
+    public double getAccumulatedQueueSize() {
+        return accumulatedQueueSize;
     }
 
-    public void setAverageQueueSize(double averageQueueSize) {
-        this.averageQueueSize = averageQueueSize;
+    public void setAccumulatedQueueSize(double accumulatedQueueSize) {
+        this.accumulatedQueueSize = accumulatedQueueSize;
     }
 
-    public double getAverageServiceSize() {
-        return averageServiceSize;
+    public double getAccumulatedServiceSize() {
+        return accumulatedServiceSize;
     }
 
-    public void setAverageServiceSize(double averageServiceSize) {
-        this.averageServiceSize = averageServiceSize;
+    public void setAccumulatedServiceSize(double accumulatedServiceSize) {
+        this.accumulatedServiceSize = accumulatedServiceSize;
     }
 
     public double getAverageResponseTime() {
@@ -121,12 +127,12 @@ public class ModuleStatistics {
         this.serviceRate = serviceRate;
     }
 
-    public double getLastEventTime() {
-        return lastEventTime;
+    public double getQueueSizeChangeTime() {
+        return queueSizeChangeTime;
     }
 
-    public void setLastEventTime(double lastEventTime) {
-        this.lastEventTime = lastEventTime;
+    public void setQueueSizeChangeTime(double queueSizeChangeTime) {
+        this.queueSizeChangeTime = queueSizeChangeTime;
     }
 
     public int getCurrentQueueSize() {
@@ -149,15 +155,47 @@ public class ModuleStatistics {
         return queriesProcessed;
     }
 
-    public void setQueriesProcessed(int queriesProcessed) {
-        this.queriesProcessed = queriesProcessed;
+    public void incrementQueriesProcessed() {
+        this.queriesProcessed++;
     }
 
     public double getIdleTime() {
         return idleTime;
     }
 
-    public void setIdleTime(double idleTime) {
-        this.idleTime = idleTime;
+    public void incrementIdleTime(double idleTime) {
+        this.idleTime += idleTime;
+    }
+
+    public int getNumberOfArrivals() {
+        return numberOfArrivals;
+    }
+
+    public void incrementNumberOfArrivals() {
+        this.numberOfArrivals++;
+    }
+
+    public double getServiceSizeChangeTime() {
+        return serviceSizeChangeTime;
+    }
+
+    public void setServiceSizeChangeTime(double serviceSizeChangeTime) {
+        this.serviceSizeChangeTime = serviceSizeChangeTime;
+    }
+
+    public double getTotalQueueTime() {
+        return totalQueueTime;
+    }
+
+    public void incrementTotalQueueTime(double totalQueueTime) {
+        this.totalQueueTime += totalQueueTime;
+    }
+
+    public double getTotalServiceTime() {
+        return totalServiceTime;
+    }
+
+    public void incrementTotalServiceTime(double totalServiceTime) {
+        this.totalServiceTime += totalServiceTime;
     }
 }

@@ -4,23 +4,31 @@ package query;
  * Created by Carlos on 03/02/2017.
  */
 public class QueryStatistics {
+    private Query query;
+
     private double systemArrivalTime; // ???
     private double systemExitTime;
+
+    private double queueEntryTime;
     private double entryTimeModule1;
     private double exitTimeModule1;
-    private double TimeModule1;
+    private double timeModule1;
     private double entryTimeModule2;
     private double exitTimeModule2;
-    private double TimeModule2;
+    private double timeModule2;
     private double entryTimeModule3;
     private double exitTimeModule3;
-    private double TimeModule3;
+    private double timeModule3;
     private double entryTimeModule4;
     private double exitTimeModule4;
-    private double TimeModule4;
+    private double timeModule4;
     private double entryTimeModule5;
     private double exitTimeModule5;
-    private double TimeModule5;
+    private double timeModule5;
+
+    public QueryStatistics(Query query){
+        this.query = query;
+    }
 
     public double getSystemArrivalTime() {
         return systemArrivalTime;
@@ -51,15 +59,13 @@ public class QueryStatistics {
     }
 
     public void setExitTimeModule1(double exitTimeModule1) {
+
         this.exitTimeModule1 = exitTimeModule1;
+        this.timeModule1 = exitTimeModule1 - entryTimeModule1;
     }
 
     public double getTimeModule1() {
-        return TimeModule1;
-    }
-
-    public void setTimeModule1(double timeModule1) {
-        TimeModule1 = timeModule1;
+        return timeModule1;
     }
 
     public double getEntryTimeModule2() {
@@ -76,14 +82,11 @@ public class QueryStatistics {
 
     public void setExitTimeModule2(double exitTimeModule2) {
         this.exitTimeModule2 = exitTimeModule2;
+        this.timeModule2 = exitTimeModule2 - entryTimeModule2;
     }
 
     public double getTimeModule2() {
-        return TimeModule2;
-    }
-
-    public void setTimeModule2(double timeModule2) {
-        TimeModule2 = timeModule2;
+        return timeModule2;
     }
 
     public double getEntryTimeModule3() {
@@ -100,14 +103,11 @@ public class QueryStatistics {
 
     public void setExitTimeModule3(double exitTimeModule3) {
         this.exitTimeModule3 = exitTimeModule3;
+        this.timeModule3 = exitTimeModule3 - entryTimeModule3;
     }
 
     public double getTimeModule3() {
-        return TimeModule3;
-    }
-
-    public void setTimeModule3(double timeModule3) {
-        TimeModule3 = timeModule3;
+        return timeModule3;
     }
 
     public double getEntryTimeModule4() {
@@ -124,14 +124,11 @@ public class QueryStatistics {
 
     public void setExitTimeModule4(double exitTimeModule4) {
         this.exitTimeModule4 = exitTimeModule4;
+        this.timeModule4 = exitTimeModule4 - entryTimeModule4;
     }
 
     public double getTimeModule4() {
-        return TimeModule4;
-    }
-
-    public void setTimeModule4(double timeModule4) {
-        TimeModule4 = timeModule4;
+        return timeModule4;
     }
 
     public double getEntryTimeModule5() {
@@ -148,13 +145,18 @@ public class QueryStatistics {
 
     public void setExitTimeModule5(double exitTimeModule5) {
         this.exitTimeModule5 = exitTimeModule5;
+        this.timeModule5 = exitTimeModule5 - entryTimeModule5;
     }
 
     public double getTimeModule5() {
-        return TimeModule5;
+        return timeModule5;
     }
 
-    public void setTimeModule5(double timeModule5) {
-        TimeModule5 = timeModule5;
+    public double getQueueEntryTime() {
+        return queueEntryTime;
+    }
+
+    public void setQueueEntryTime(double queueEntryTime) {
+        this.queueEntryTime = queueEntryTime;
     }
 }

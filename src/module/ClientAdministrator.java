@@ -4,6 +4,8 @@ import query.*;
 import utils.ProbabilityDistributions;
 import event.*;
 
+import java.util.ArrayDeque;
+
 
 /**
  * Created by Carlos on 03/02/2017.
@@ -18,14 +20,23 @@ public class ClientAdministrator extends Module {
         k = concurrentConnections;
         this.nextModule = next;
         discardedConnections = 0;
+        queue = new ArrayDeque<>();
+        statistics = new ModuleStatistics(this);
     }
 
     @Override
     public void processArrival(Query query){
-        double time = DBMS.getClock();
+        double currentTime = DBMS.getClock();
         System.out.println("Connection " + query.getID() + " entered Client Administrator module");
+
+        //Adjust Statistics.
+        query.setCurrentModule(this);
         QueryStatistics queryStatistics = query.getStatistics();
-        queryStatistics.setTimeModule1(time);
+        queryStatistics.setSystemArrivalTime(currentTime);
+        queryStatistics.setEntryTimeModule1(currentTime);
+        statistics.incrementNumberOfArrivals();
+
+        //Attend if posible, discard otherwise.
         if (servers > 0){
             this.attendQuery(query);
         }
@@ -35,16 +46,35 @@ public class ClientAdministrator extends Module {
     }
 
     public void processExit(Query query) {
+        double currentTime = DBMS.getClock();
         System.out.println("Connection " + query.getID() + " exited Client Administrator module");
+
+        //Adjust Statistics.
         QueryStatistics queryStatistics = query.getStatistics();
-        queryStatistics.setExitTimeModule1(DBMS.getClock() );
+        queryStatistics.setExitTimeModule1(currentTime);
+        statistics.incrementTotalServiceTime(queryStatistics.getTimeModule1());
+
         if (!query.isTimeOut() ) {
             nextModule.processArrival(query);
         }
     }
 
     public void returnQueryResult(Query query){
+        //Calculate
         double time = DBMS.getClock() + (double) query.getBlocks() / 6.0;
+
+        //Adjust Statistics
+        query.getStatistics().setSystemExitTime(time);
+        statistics.incrementQueriesProcessed();
+
+        double timeChange = time - statistics.getServiceSizeChangeTime();
+        int currentServiceSize = k - servers;
+        double averageServiceSize = statistics.getAccumulatedServiceSize();
+        statistics.setAccumulatedServiceSize(averageServiceSize + (timeChange*currentServiceSize));
+        statistics.setServiceSizeChangeTime(time);
+
+
+        //Create Query Return event
         Event event = new Event(EventType.QUERY_RETURN, time, query);
         DBMS.addEvent(event);
         servers++;
@@ -53,8 +83,25 @@ public class ClientAdministrator extends Module {
     @Override
     protected void attendQuery(Query query) {
         double time = DBMS.getClock();
+
+        //Adjust Statistics.
         QueryStatistics queryStatistics = query.getStatistics();
         queryStatistics.setEntryTimeModule1(time);
+        //If server was idle increment idle time
+        double timeChange = time - statistics.getServiceSizeChangeTime();
+        if(servers==k){
+            statistics.incrementIdleTime(timeChange);
+        }
+        //Else adjust averageServiceSize
+        else{
+            int currentServiceSize = k - servers;
+            double averageServiceSize = statistics.getAccumulatedServiceSize();
+            statistics.setAccumulatedServiceSize(averageServiceSize + (timeChange*currentServiceSize));
+        }
+        //Record time when service size changed
+        statistics.setServiceSizeChangeTime(time);
+
+        //Create Module End event
         double duration = ProbabilityDistributions.Uniform(0.01, 0.05);
         Event event = new Event(EventType.MODULE_END, time + duration, query);
         DBMS.addEvent(event);
@@ -62,6 +109,12 @@ public class ClientAdministrator extends Module {
     }
 
     public void freeConnection(){
+        double time = DBMS.getClock();
+        double timeChange = time - statistics.getServiceSizeChangeTime();
+        int currentServiceSize = k - servers;
+        double averageServiceSize = statistics.getAccumulatedServiceSize();
+        statistics.setAccumulatedServiceSize(averageServiceSize + (timeChange*currentServiceSize));
+        statistics.setServiceSizeChangeTime(time);
         servers++;
     }
 }
