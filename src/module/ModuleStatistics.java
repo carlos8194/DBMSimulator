@@ -48,12 +48,10 @@ public class ModuleStatistics {
     }
 
     public double getAverageSystemSize() {
+        averageSystemSize = averageQueueSize + averageServiceSize;
         return averageSystemSize;
     }
 
-    public void setAverageSystemSize(double averageSystemSize) {
-        this.averageSystemSize = averageSystemSize;
-    }
 
     public double getAccumulatedQueueSize() {
         return accumulatedQueueSize;
@@ -72,12 +70,11 @@ public class ModuleStatistics {
     }
 
     public double getAverageResponseTime() {
+        averageResponseTime = averageQueueTime + averageServiceTime;
         return averageResponseTime;
     }
 
-    public void setAverageResponseTime(double averageResponseTime) {
-        this.averageResponseTime = averageResponseTime;
-    }
+    //Falta limpiar
 
     public double getAverageQueueTime() {
         return averageQueueTime;

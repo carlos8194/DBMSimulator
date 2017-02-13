@@ -6,7 +6,7 @@ package query;
 public class QueryStatistics {
     private Query query;
 
-    private double systemArrivalTime; // ???
+    private double systemArrivalTime;
     private double systemExitTime;
 
     private double queueEntryTime;

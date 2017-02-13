@@ -10,11 +10,10 @@ import java.util.ArrayDeque;
  * Created by Rodrigo on 2/7/2017.
  */
 public  class QueryProcessor extends Module {
-    private int n;
 
-    public QueryProcessor(int availableProcesses, Module next){
-        servers = availableProcesses;
-        n = availableProcesses;
+    public QueryProcessor(int n, Module next){
+        availableServers = n;
+        moduleCapacity = n;
         nextModule = next;
         queue = new ArrayDeque<>();
     }
@@ -29,19 +28,12 @@ public  class QueryProcessor extends Module {
         queryStatistics.setEntryTimeModule3(time);
         statistics.incrementNumberOfArrivals();
 
-        if (servers > 0){
+        if (availableServers > 0){
             this.attendQuery(query);
         }
         else {
             //Lq: QueueSize change due to entry.
-            double timeChange = statistics.getQueueSizeChangeTime()- time;
-            double currentAverage = statistics.getAccumulatedQueueSize();
-            statistics.setAccumulatedQueueSize(currentAverage + (queue.size()*timeChange));
-            statistics.setQueueSizeChangeTime(time);
-            query.setCurrentlyInQueue(true);
-            queryStatistics.setQueueEntryTime(time);
-
-            queue.add(query);
+            this.recordQueueChange(query,changeType.ENTRY);
         }
     }
 
@@ -65,34 +57,17 @@ public  class QueryProcessor extends Module {
 
         //Query came from queue
         if(query.isCurrentlyInQueue()){
-            //Change in Wq
-            double queuetime = queryStatistics.getQueueEntryTime()-time;
-            query.setCurrentlyInQueue(false);
-            statistics.incrementTotalQueueTime(queuetime);
-            //Lq: QueueSize change due to exit.
-            double timeChange = statistics.getQueueSizeChangeTime()-time;
-            double currentAverage = statistics.getAccumulatedQueueSize();
-            statistics.setAccumulatedQueueSize(currentAverage + (queue.size()*timeChange));
-            statistics.setQueueSizeChangeTime(time);
+            //Lq: QueueSize change due to exit and change in Wq.
+            this.recordQueueChange(query,changeType.EXIT);
         }
         //Query was attended immediately.
-        double timeChange = time - statistics.getServiceSizeChangeTime();
-        //If server was idle increment idle time
-        if(servers==n){
-            statistics.incrementIdleTime(timeChange);
-        }
-        //Ls: ServiceSize change due to entry.
-        double averageServiceSize = statistics.getAccumulatedServiceSize();
-        int currentServiceSize = n-servers;
-        statistics.setAccumulatedServiceSize(averageServiceSize + (timeChange*currentServiceSize));
-        //Record time when service size changed
-        statistics.setServiceSizeChangeTime(time);
-
+        //Ls: ServiceSize change due to entry, possible idleTime change.
+        this.recordServiceChange(query,changeType.ENTRY);
 
         //Create ModuleEnd event.
         Event event = new Event(EventType.MODULE_END, time + duration, query);
         DBMS.addEvent(event);
-        servers--;
+        availableServers--;
     }
 
     @Override
@@ -104,14 +79,11 @@ public  class QueryProcessor extends Module {
         QueryStatistics queryStatistics = query.getStatistics();
         queryStatistics.setExitTimeModule3(time);
         statistics.incrementTotalServiceTime(queryStatistics.getTimeModule3());
-        statistics.incrementQueriesProcessed();
+        //Ls: ServiceSize change due to exit, number of queries increases.
+        this.recordServiceChange(query,changeType.EXIT);
 
-        //Ls: ServiceSize change due to exit.
-        double timeChange = time - statistics.getServiceSizeChangeTime();
-        double averageServiceSize = statistics.getAccumulatedServiceSize();
-        statistics.setAccumulatedServiceSize(averageServiceSize + timeChange);
-        statistics.setServiceSizeChangeTime(time);
-        servers++;
+        //Free a server.
+        availableServers++;
 
         //Attend someone from queue.
         Query anotherQuery = queue.poll();

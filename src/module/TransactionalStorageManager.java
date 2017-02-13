@@ -10,11 +10,10 @@ import java.util.PriorityQueue;
  * Created by Rodrigo on 2/7/2017.
  */
 public class TransactionalStorageManager extends Module {
-    private int p;
 
-    public TransactionalStorageManager(int simultaneousConsultations, Module next){
-        p = simultaneousConsultations;
-        servers = simultaneousConsultations;
+    public TransactionalStorageManager(int p, Module next){
+        moduleCapacity = p;
+        availableServers = p;
         nextModule = next;
         queue = new PriorityQueue<>(Query::compareTo);
     }
@@ -39,18 +38,12 @@ public class TransactionalStorageManager extends Module {
             nextType=null;
         }
 
-        if((type == QueryType.DDL && servers == p) || (nextType != QueryType.DDL && servers > 0)){
+        if((type == QueryType.DDL && availableServers == moduleCapacity) || (nextType != QueryType.DDL && availableServers > 0)){
             attendQuery(query);
         }
         else{
             //Lq: QueueSize change due to entry.
-            double timeChange = statistics.getQueueSizeChangeTime()- time;
-            double currentAverage = statistics.getAccumulatedQueueSize();
-            statistics.setAccumulatedQueueSize(currentAverage + (queue.size()*timeChange));
-            statistics.setQueueSizeChangeTime(time);
-            query.setCurrentlyInQueue(true);
-            queryStatistics.setQueueEntryTime(time);
-            queue.add(query);
+            this.recordQueueChange(query,changeType.ENTRY);
         }
 
     }
@@ -65,14 +58,11 @@ public class TransactionalStorageManager extends Module {
         QueryStatistics queryStatistics = query.getStatistics();
         queryStatistics.setExitTimeModule4(time);
         statistics.incrementTotalServiceTime(queryStatistics.getTimeModule4());
-        statistics.incrementQueriesProcessed();
+        //Ls: ServiceSize change due to exit, number of queries increases.
+        this.recordServiceChange(query,changeType.EXIT);
 
-        //Ls: ServiceSize change due to exit.
-        double timeChange = time - statistics.getServiceSizeChangeTime();
-        double averageServiceSize = statistics.getAccumulatedServiceSize();
-        statistics.setAccumulatedServiceSize(averageServiceSize + timeChange);
-        statistics.setServiceSizeChangeTime(time);
-        servers = (query.getQueryType() == QueryType.DDL) ? p : servers + 1;
+        //Free servers
+        availableServers = (query.getQueryType() == QueryType.DDL) ? moduleCapacity : availableServers + 1;
 
         //Attend someone from queue.
         Query anotherQuery = queue.peek();
@@ -82,7 +72,7 @@ public class TransactionalStorageManager extends Module {
                 this.attendQuery(anotherQuery);
                 queue.poll();
             }
-            else if (servers == p){
+            else if (availableServers == moduleCapacity){
                 this.attendQuery(anotherQuery);
                 queue.poll();
             }
@@ -95,7 +85,7 @@ public class TransactionalStorageManager extends Module {
     @Override
     protected void attendQuery(Query query) {
         double time = DBMS.getClock();
-        double duration = p*0.03 + 0.1*this.calculateBlocks(query);
+        double duration = moduleCapacity*0.03 + 0.1*this.calculateBlocks(query);
 
         //Adjust statistics.
         QueryStatistics queryStatistics = query.getStatistics();
@@ -103,33 +93,17 @@ public class TransactionalStorageManager extends Module {
 
         //Query came from queue
         if(query.isCurrentlyInQueue()){
-            //Change in Wq
-            double queuetime = queryStatistics.getQueueEntryTime()-time;
-            query.setCurrentlyInQueue(false);
-            statistics.incrementTotalQueueTime(queuetime);
-            //Lq: QueueSize change due to exit.
-            double timeChange = statistics.getQueueSizeChangeTime()-time;
-            double currentAverage = statistics.getAccumulatedQueueSize();
-            statistics.setAccumulatedQueueSize(currentAverage + (queue.size()*timeChange));
-            statistics.setQueueSizeChangeTime(time);
+            //Lq: QueueSize change due to exit and change in Wq.
+            this.recordQueueChange(query,changeType.EXIT);
         }
         //Query was attended immediately.
-        double timeChange = time - statistics.getServiceSizeChangeTime();
-        //If server was idle increment idle time
-        if(servers==p){
-            statistics.incrementIdleTime(timeChange);
-        }
-        //Ls: ServiceSize change due to entry.
-        double averageServiceSize = statistics.getAccumulatedServiceSize();
-        int currentServiceSize = p-servers;
-        statistics.setAccumulatedServiceSize(averageServiceSize + (timeChange*currentServiceSize));
-        //Record time when service size changed
-        statistics.setServiceSizeChangeTime(time);
+        //Ls: ServiceSize change due to entry, possible idleTime change.
+        this.recordServiceChange(query,changeType.ENTRY);
 
         //Create ModuleEnd event.
         Event event = new Event(EventType.MODULE_END, time + duration, query);
         DBMS.addEvent(event);
-        servers = (query.getQueryType() == QueryType.DDL) ? 0 : servers - 1;
+        availableServers = (query.getQueryType() == QueryType.DDL) ? 0 : availableServers - 1;
     }
 
     private int calculateBlocks(Query query){
