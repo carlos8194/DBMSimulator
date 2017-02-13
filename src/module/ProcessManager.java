@@ -13,6 +13,7 @@ import java.util.ArrayDeque;
 public class ProcessManager extends Module {
 
     public ProcessManager(Module next){
+        moduleNumber = 2;
         nextModule = next;
         queue = new ArrayDeque<>();
         availableServers = 1;
@@ -27,7 +28,7 @@ public class ProcessManager extends Module {
         //Adjust Statistics.
         query.setCurrentModule(this);
         QueryStatistics queryStatistics = query.getStatistics();
-        queryStatistics.setEntryTimeModule2(time);
+        queryStatistics.setModuleEntryTime(moduleNumber,time);
         statistics.incrementNumberOfArrivals();
 
         if (availableServers > 0){
@@ -45,9 +46,6 @@ public class ProcessManager extends Module {
         System.out.println("Connection " + query.getID() + " exited Process Manager module");
 
         //Adjust Statistics.
-        QueryStatistics queryStatistics = query.getStatistics();
-        queryStatistics.setExitTimeModule2(time);
-        statistics.incrementTotalServiceTime(queryStatistics.getTimeModule2());
         //Ls: ServiceSize change due to exit, number of queries increases.
         this.recordServiceChange(query,changeType.EXIT);
 
@@ -71,9 +69,6 @@ public class ProcessManager extends Module {
         double duration = ProbabilityDistributions.Normal(1.5, 0.1);
 
         //Adjust statistics.
-        QueryStatistics queryStatistics = query.getStatistics();
-        queryStatistics.setEntryTimeModule2(time);
-
         //Query came from queue
         if(query.isCurrentlyInQueue()){
             //Lq: QueueSize change due to exit and change in Wq.

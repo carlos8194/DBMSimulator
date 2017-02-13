@@ -2,32 +2,29 @@ package dbms;
 
 import module.Module;
 import module.ModuleStatistics;
+import query.*;
 
 /**
  * Created by Rodrigo on 2/4/2017.
  */
 public class DBMSStatistics {
     //General(Internal use)
-    int numberOfQueries;
     int numberOfSelects;
     int numberOfUpdates;
     int numberOfJoins;
     int numberOfDDls;
+    int totalQueriesProcessed;
 
-    //1.DBMS Parameters
+    //1.DBMS Parameters.
+    double time;
     int k;
     int n;
     int p;
     int m;
-    int t;
-    int time;
+    double t;
 
-    //3.Average Queue Size by Module.
-    double averageQueueSizeModule1;
-    double averageQueueSizeModule2;
-    double averageQueueSizeModule3;
-    double averageQueueSizeModule4;
-    double averageQueueSizeModule5;
+
+    //3.Average Queue Size by Module. Contained in moduleStatistics.
 
     //4.Average Query Lifetime.
     double averageQueryLifeTime;
@@ -36,40 +33,116 @@ public class DBMSStatistics {
     int discartedConnections;
 
     //6.Average time spent on each Module by QueryType.
-    double averageSelectModule1Time;
-    double averageSelectModule2Time;
-    double averageSelectModule3Time;
-    double averageSelectModule4Time;
-    double averageSelectModule5Time;
-    double averageUpdateModule1Time;
-    double averageUpdateModule2Time;
-    double averageUpdateModule3Time;
-    double averageUpdateModule4Time;
-    double averageUpdateModule5Time;
-    double averageJoinModule1Time;
-    double averageJoinModule2Time;
-    double averageJoinModule3Time;
-    double averageJoinModule4Time;
-    double averageJoinModule5Time;
-    double averageDDLModule1Time;
-    double averageDDLModule2Time;
-    double averageDDLModule3Time;
-    double averageDDLModule4Time;
-    double averageDDLModule5Time;
+    double[] averageSelectTimes;
+    double[] averageUpdateTimes;
+    double[] averageJoinTimes;
+    double[] averageDDLTimes;
 
-    //7.Idle time by Module.
-    double idleTimeModule1;
-    double idleTimeModule2;
-    double idleTimeModule3;
-    double idleTimeModule4;
-    double idleTimeModule5;
+
+    //7.Idle time by Module. Contained in ModuleStatistics.
+
 
     //8.Module Statistics.
-    ModuleStatistics module1Statistics;
-    ModuleStatistics module2Statistics;
-    ModuleStatistics module3Statistics;
-    ModuleStatistics module4Statistics;
-    ModuleStatistics module5Statistics;
+    ModuleStatistics[] moduleStatistics;
+
+    public DBMSStatistics(double time,int k, int n, int p,int m, double t){
+        this.time = time;
+        this.k = k;
+        this.n = n;
+        this.p = p;
+        this.m = m;
+        this.t = t;
+        averageSelectTimes = new double[5];
+        averageUpdateTimes = new double[5];
+        averageJoinTimes = new double[5];
+        averageDDLTimes = new double[5];
+
+    }
+
+    public void calculateFinalStatistics(){
+        for(ModuleStatistics statistics: moduleStatistics){
+            statistics.calculateFinalStatistics();
+        }
+        averageQueryLifeTime = averageQueryLifeTime/totalQueriesProcessed;
+        for(double time: averageSelectTimes){time = time/numberOfSelects;}
+        for(double time: averageDDLTimes){time = time/numberOfDDls;}
+        for(double time: averageJoinTimes){time = time/numberOfJoins;}
+        for(double time: averageUpdateTimes){time = time/numberOfUpdates;}
+    }
+
+
+    //Running Statistics Methods.
+    public void incrementDiscartedConnections(){discartedConnections++;}
+
+    public void processQueryReturn(Query query) {
+        averageQueryLifeTime += query.getStatistics().getQueryLifeTime();
+        totalQueriesProcessed++;
+    }
+    public void processModuleEnd(Query query, int moduleNumber) {
+        QueryType queryType = query.getQueryType();
+        switch (queryType){
+            case DDL:
+                averageDDLTimes[moduleNumber] += query.getStatistics().getModuleTime(moduleNumber);
+                numberOfDDls++;
+                break;
+            case JOIN:
+                averageJoinTimes[moduleNumber] += query.getStatistics().getModuleTime(moduleNumber);
+                numberOfJoins++;
+                break;
+            case SELECT:
+                averageSelectTimes[moduleNumber] += query.getStatistics().getModuleTime(moduleNumber);
+                numberOfSelects++;
+                break;
+            case UPDATE:
+                averageUpdateTimes[moduleNumber] += query.getStatistics().getModuleTime(moduleNumber);
+                numberOfUpdates++;
+                break;
+        }
+    }
+
+
+    //Interface Statistics.
+
+
+    //Final Statistics for report.
+    //3.Average Queue Size.
+    public double getAverageQueueSize(int moduleNumber){
+        ModuleStatistics statistics = moduleStatistics[moduleNumber];
+        return statistics.getAverageQueueSize();
+    }
+    //4.Average Query Lifetime
+    public double getAverageQueryLifeTime(){
+        return averageQueryLifeTime;
+    }
+    //5.Number of discarted connections.
+    public int getNumberOfDiscartedConnections(){
+        return discartedConnections;
+    }
+    //6. Average time spent on each module by queryType
+    public double[] getAverageTimesByQueryType(QueryType queryType){
+        switch (queryType){
+            case DDL:
+                return averageDDLTimes;
+            case JOIN:
+                return averageJoinTimes;
+            case SELECT:
+                return averageSelectTimes;
+            case UPDATE:
+                return averageUpdateTimes;
+        }
+        return null;
+    }
+    //7.Idle time by Module. Contained in ModuleStatistics.
+    public double getModuleIdleTime(int moduleNumber){
+        return moduleStatistics[moduleNumber].getIdleTime();
+    }
+
+    //8.Module Statistics.
+    public ModuleStatistics getModuleStatistics(int moduleNumber){
+        return moduleStatistics[moduleNumber];
+    }
+
+
 
 
 }

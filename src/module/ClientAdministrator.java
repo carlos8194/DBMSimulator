@@ -1,5 +1,6 @@
 package module;
 
+import dbms.DBMS;
 import query.*;
 import utils.ProbabilityDistributions;
 import event.*;
@@ -13,13 +14,12 @@ import java.util.ArrayDeque;
 public class ClientAdministrator extends Module {
     
     private int k;
-    private int discardedConnections;
 
     public ClientAdministrator(int concurrentConnections, Module next){
+        moduleNumber=1;
         availableServers = concurrentConnections;
         k = concurrentConnections;
         this.nextModule = next;
-        discardedConnections = 0;
         queue = new ArrayDeque<>();
         statistics = new ModuleStatistics(this);
     }
@@ -33,7 +33,6 @@ public class ClientAdministrator extends Module {
         query.setCurrentModule(this);
         QueryStatistics queryStatistics = query.getStatistics();
         queryStatistics.setSystemArrivalTime(currentTime);
-        queryStatistics.setEntryTimeModule1(currentTime);
         statistics.incrementNumberOfArrivals();
 
         //Attend if posible, discard otherwise.
@@ -41,7 +40,7 @@ public class ClientAdministrator extends Module {
             this.attendQuery(query);
         }
         else {
-            discardedConnections++;
+            DBMS.incrementDiscartedConnections();
         }
     }
 
@@ -51,8 +50,8 @@ public class ClientAdministrator extends Module {
 
         //Adjust Statistics.
         QueryStatistics queryStatistics = query.getStatistics();
-        queryStatistics.setExitTimeModule1(currentTime);
-        statistics.incrementTotalServiceTime(queryStatistics.getTimeModule1());
+        queryStatistics.setModuleExitTime(moduleNumber,currentTime);
+        statistics.incrementTotalServiceTime(queryStatistics.getModuleTime(moduleNumber));
 
         if (!query.isTimeOut() ) {
             nextModule.processArrival(query);
@@ -86,7 +85,7 @@ public class ClientAdministrator extends Module {
 
         //Adjust Statistics.
         QueryStatistics queryStatistics = query.getStatistics();
-        queryStatistics.setEntryTimeModule1(time);
+        queryStatistics.setModuleEntryTime(moduleNumber,time);
         //If server was idle increment idle time
         double timeChange = time - statistics.getServiceSizeChangeTime();
         if(availableServers ==k){

@@ -13,6 +13,7 @@ public class QueryExecutor extends Module {
     private ClientAdministrator administrator;
 
     public QueryExecutor(int m, Module next){
+        moduleNumber = 5;
         moduleCapacity = m;
         availableServers = m;
         nextModule = next;
@@ -27,7 +28,7 @@ public class QueryExecutor extends Module {
         //Adjust Statistics.
         query.setCurrentModule(this);
         QueryStatistics queryStatistics = query.getStatistics();
-        queryStatistics.setEntryTimeModule5(time);
+        queryStatistics.setModuleEntryTime(moduleNumber,time);
         statistics.incrementNumberOfArrivals();
 
         if (availableServers > 0){
@@ -45,9 +46,6 @@ public class QueryExecutor extends Module {
         System.out.println("Conecction " + query.getID() + " exited Query Executor module");
 
         //Adjust Statistics.
-        QueryStatistics queryStatistics = query.getStatistics();
-        queryStatistics.setExitTimeModule5(time);
-        statistics.incrementTotalServiceTime(queryStatistics.getTimeModule5());
         //Ls: ServiceSize change due to exit, number of queries increases.
         this.recordServiceChange(query,changeType.EXIT);
 
@@ -70,9 +68,6 @@ public class QueryExecutor extends Module {
         double duration = this.calculateDuration(query);
 
         //Adjust Statistics.
-        QueryStatistics queryStatistics = query.getStatistics();
-        queryStatistics.setEntryTimeModule5(time);
-
         //Query came from queue
         if(query.isCurrentlyInQueue()){
             //Lq: QueueSize change due to exit and change in Wq.

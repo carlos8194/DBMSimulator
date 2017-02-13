@@ -9,6 +9,7 @@ import java.util.Queue;
  * Created by Carlos on 03/02/2017.
  */
 public abstract class Module {
+    protected int moduleNumber;
     protected DBMS DBMS;
     protected ModuleStatistics statistics;
     protected int moduleCapacity;
@@ -49,6 +50,7 @@ public abstract class Module {
             query.setCurrentlyInQueue(false);
             //Wq: TotalQueueTime change.
             double queuetime = queryStatistics.getQueueEntryTime()-time;
+            queryStatistics.setModuleQueueTime(moduleNumber,queuetime);
             statistics.incrementTotalQueueTime(queuetime);
         }
     }
@@ -67,9 +69,16 @@ public abstract class Module {
             statistics.incrementIdleTime(timeChange);
         }
         else if (changeType==changeType.EXIT){
+            QueryStatistics queryStatistics = query.getStatistics();
+            queryStatistics.setModuleExitTime(moduleNumber,time);
+            //Ws: average service time change.
+            statistics.incrementTotalServiceTime(queryStatistics.getModuleTime(moduleNumber));
+
             statistics.incrementQueriesProcessed();
         }
     }
+
+    public int getModuleNumber(){return moduleNumber;}
 
 }
 

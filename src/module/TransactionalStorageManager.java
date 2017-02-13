@@ -12,6 +12,7 @@ import java.util.PriorityQueue;
 public class TransactionalStorageManager extends Module {
 
     public TransactionalStorageManager(int p, Module next){
+        moduleNumber = 4;
         moduleCapacity = p;
         availableServers = p;
         nextModule = next;
@@ -26,7 +27,7 @@ public class TransactionalStorageManager extends Module {
         //Adjust Statistics.
         query.setCurrentModule(this);
         QueryStatistics queryStatistics = query.getStatistics();
-        queryStatistics.setEntryTimeModule4(time);
+        queryStatistics.setModuleEntryTime(moduleNumber,time);
         statistics.incrementNumberOfArrivals();
 
         QueryType type = query.getQueryType();
@@ -53,12 +54,7 @@ public class TransactionalStorageManager extends Module {
         double time = DBMS.getClock();
         System.out.println("Connection " + query.getID() + " exited Transactional Storage Manager module");
 
-
         //Adjust Statistics.
-        QueryStatistics queryStatistics = query.getStatistics();
-        queryStatistics.setExitTimeModule4(time);
-        statistics.incrementTotalServiceTime(queryStatistics.getTimeModule4());
-        //Ls: ServiceSize change due to exit, number of queries increases.
         this.recordServiceChange(query,changeType.EXIT);
 
         //Free servers
@@ -86,10 +82,6 @@ public class TransactionalStorageManager extends Module {
     protected void attendQuery(Query query) {
         double time = DBMS.getClock();
         double duration = moduleCapacity*0.03 + 0.1*this.calculateBlocks(query);
-
-        //Adjust statistics.
-        QueryStatistics queryStatistics = query.getStatistics();
-        queryStatistics.setEntryTimeModule4(time);
 
         //Query came from queue
         if(query.isCurrentlyInQueue()){

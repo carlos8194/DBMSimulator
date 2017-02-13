@@ -12,6 +12,7 @@ import java.util.ArrayDeque;
 public  class QueryProcessor extends Module {
 
     public QueryProcessor(int n, Module next){
+        moduleNumber = 3;
         availableServers = n;
         moduleCapacity = n;
         nextModule = next;
@@ -25,7 +26,7 @@ public  class QueryProcessor extends Module {
         //Adjust Statistics.
         query.setCurrentModule(this);
         QueryStatistics queryStatistics = query.getStatistics();
-        queryStatistics.setEntryTimeModule3(time);
+        queryStatistics.setModuleEntryTime(moduleNumber,time);
         statistics.incrementNumberOfArrivals();
 
         if (availableServers > 0){
@@ -51,10 +52,6 @@ public  class QueryProcessor extends Module {
         double time = DBMS.getClock();
         double duration = this.calculateDuration(query);
 
-        //Adjust Statistics
-        QueryStatistics queryStatistics = query.getStatistics();
-        queryStatistics.setEntryTimeModule3(time);
-
         //Query came from queue
         if(query.isCurrentlyInQueue()){
             //Lq: QueueSize change due to exit and change in Wq.
@@ -76,10 +73,6 @@ public  class QueryProcessor extends Module {
         System.out.println("Connection " + query.getID() + " exited Query Processor module");
 
         //Adjust Statistics.
-        QueryStatistics queryStatistics = query.getStatistics();
-        queryStatistics.setExitTimeModule3(time);
-        statistics.incrementTotalServiceTime(queryStatistics.getTimeModule3());
-        //Ls: ServiceSize change due to exit, number of queries increases.
         this.recordServiceChange(query,changeType.EXIT);
 
         //Free a server.

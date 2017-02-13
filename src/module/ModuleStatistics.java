@@ -34,8 +34,9 @@ public class ModuleStatistics {
     private int numberOfArrivals;
     private int queriesProcessed;
 
-    public ModuleStatistics(Module module){
 
+
+    public ModuleStatistics(Module module){
         this.setModule(module);
     }
 
@@ -52,22 +53,6 @@ public class ModuleStatistics {
         return averageSystemSize;
     }
 
-
-    public double getAccumulatedQueueSize() {
-        return accumulatedQueueSize;
-    }
-
-    public void setAccumulatedQueueSize(double accumulatedQueueSize) {
-        this.accumulatedQueueSize = accumulatedQueueSize;
-    }
-
-    public double getAccumulatedServiceSize() {
-        return accumulatedServiceSize;
-    }
-
-    public void setAccumulatedServiceSize(double accumulatedServiceSize) {
-        this.accumulatedServiceSize = accumulatedServiceSize;
-    }
 
     public double getAverageResponseTime() {
         averageResponseTime = averageQueueTime + averageServiceTime;
@@ -92,7 +77,7 @@ public class ModuleStatistics {
         this.averageServiceTime = averageServiceTime;
     }
 
-    public boolean isStability() {
+    public boolean isStable(){
         return stability;
     }
 
@@ -195,4 +180,32 @@ public class ModuleStatistics {
     public void incrementTotalServiceTime(double totalServiceTime) {
         this.totalServiceTime += totalServiceTime;
     }
+
+    public double getAccumulatedQueueSize() {
+        return accumulatedQueueSize;
+    }
+
+    public void setAccumulatedQueueSize(double accumulatedQueueSize) {
+        this.accumulatedQueueSize = accumulatedQueueSize;
+    }
+
+    public double getAccumulatedServiceSize() {
+        return accumulatedServiceSize;
+    }
+
+    public void setAccumulatedServiceSize(double accumulatedServiceSize) {
+        this.accumulatedServiceSize = accumulatedServiceSize;
+    }
+
+    public double getAverageQueueSize() {
+        return averageQueueSize;
+    }
+
+    public void calculateFinalStatistics(){
+
+
+    }
+
+
+
 }

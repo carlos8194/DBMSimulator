@@ -66,18 +66,19 @@ public class DBMS {
             //Process Event
             Query query = currentEvent.getQuery();
             switch(currentEvent.getType()){
-                case NEW_QUERY: processNewQuery();
-                case MODULE_END: processModuleEnd(query);
-                case QUERY_RETURN: processQueryReturn(query);
-                case QUERY_TIMEOUT: processQueryTimeout(query);
+                case NEW_QUERY: processNewQuery();break;
+                case MODULE_END: processModuleEnd(query);break;
+                case QUERY_RETURN: processQueryReturn(query);break;
+                case QUERY_TIMEOUT: processQueryTimeout(query);break;
             }
         }
+        dbmsStatistics.calculateFinalStatistics();
         return dbmsStatistics;
     }
 
     private void initializeDBMS() {
         //DBMS variables
-        dbmsStatistics = new DBMSStatistics();
+        dbmsStatistics = new DBMSStatistics(totalRunningTime,concurrentConnections,availableProcesses,simultaneousConsultations,parallelStatements,queryTimeoutTime);
         eventList= new PriorityQueue<>(Event::compareTo);
         //Modules
         clientAdministrator = new ClientAdministrator(concurrentConnections, processManager);
@@ -93,13 +94,15 @@ public class DBMS {
     }
 
     private void processQueryReturn(Query query) {
-
+        dbmsStatistics.processQueryReturn(query);
         query.getStatistics().setSystemExitTime(clock);
     }
 
     private void processModuleEnd(Query query) {
-
-        query.getCurrentModule().processExit(query);
+        Module currentModule = query.getCurrentModule();
+        int moduleNumber = currentModule.getModuleNumber();
+        currentModule.processExit(query);
+        dbmsStatistics.processModuleEnd(query,moduleNumber);
     }
 
     private void processNewQuery() {
@@ -114,6 +117,9 @@ public class DBMS {
 
     public double getClock() {
         return clock;
+    }
+    public void incrementDiscartedConnections(){
+        dbmsStatistics.incrementDiscartedConnections();
     }
     
 }
