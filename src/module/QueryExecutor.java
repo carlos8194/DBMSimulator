@@ -13,77 +13,16 @@ public class QueryExecutor extends Module {
     private ClientAdministrator administrator;
 
     public QueryExecutor(int m, Module next){
-        moduleNumber = 5;
+        moduleNumber = 4;
         moduleCapacity = m;
         availableServers = m;
         nextModule = next;
         administrator = (ClientAdministrator) next;
         queue = new ArrayDeque<>();
     }
-    @Override
-    public void processArrival(Query query) {
-        double time = DBMS.getClock();
-        System.out.println("Conecction " + query.getID() + " entered Query Executor module");
-
-        //Adjust Statistics.
-        query.setCurrentModule(this);
-        QueryStatistics queryStatistics = query.getStatistics();
-        queryStatistics.setModuleEntryTime(moduleNumber,time);
-        statistics.incrementNumberOfArrivals();
-
-        if (availableServers > 0){
-            this.attendQuery(query);
-        }
-        else {
-            //Lq: QueueSize change due to entry.
-            this.recordQueueChange(query,changeType.ENTRY);
-        }
-    }
 
     @Override
-    public void processExit(Query query) {
-        double time = DBMS.getClock();
-        System.out.println("Conecction " + query.getID() + " exited Query Executor module");
-
-        //Adjust Statistics.
-        //Ls: ServiceSize change due to exit, number of queries increases.
-        this.recordServiceChange(query,changeType.EXIT);
-
-        //Free a server.
-        availableServers++;
-
-        //Attend someone from queue.
-        Query anotherQuery = queue.poll();
-        if (anotherQuery != null){
-            this.attendQuery(anotherQuery);
-        }
-        if ( !query.isTimeOut() ){
-            administrator.returnQueryResult(query);
-        }
-    }
-
-    @Override
-    protected void attendQuery(Query query) {
-        double time = DBMS.getClock();
-        double duration = this.calculateDuration(query);
-
-        //Adjust Statistics.
-        //Query came from queue
-        if(query.isCurrentlyInQueue()){
-            //Lq: QueueSize change due to exit and change in Wq.
-            this.recordQueueChange(query,changeType.EXIT);
-        }
-        //Query was attended immediately.
-        //Ls: ServiceSize change due to entry, possible idleTime change.
-        this.recordServiceChange(query,changeType.ENTRY);
-
-        //Add Module End event.
-        Event event = new Event(EventType.MODULE_END, time + duration, query);
-        DBMS.addEvent(event);
-        availableServers--;
-    }
-
-    private double calculateDuration(Query query){
+    protected double calculateDuration(Query query){
         double duration;
         switch ( query.getQueryType() ){
             case DDL:

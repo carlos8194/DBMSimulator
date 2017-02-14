@@ -12,24 +12,17 @@ import java.util.PriorityQueue;
 public class TransactionalStorageManager extends Module {
 
     public TransactionalStorageManager(int p, Module next){
-        moduleNumber = 4;
+        moduleNumber = 3;
         moduleCapacity = p;
         availableServers = p;
         nextModule = next;
         queue = new PriorityQueue<>(Query::compareTo);
     }
 
+
+
     @Override
-    public void processArrival(Query query) {
-        double time = DBMS.getClock();
-        System.out.println("Conecction " + query.getID() + " entered Transactional Storage Manager module");
-
-        //Adjust Statistics.
-        query.setCurrentModule(this);
-        QueryStatistics queryStatistics = query.getStatistics();
-        queryStatistics.setModuleEntryTime(moduleNumber,time);
-        statistics.incrementNumberOfArrivals();
-
+    protected boolean attendImmediately(Query query){
         QueryType type = query.getQueryType();
         QueryType nextType;
         if(queue.peek() != null){
@@ -38,64 +31,34 @@ public class TransactionalStorageManager extends Module {
         else{
             nextType=null;
         }
-
         if((type == QueryType.DDL && availableServers == moduleCapacity) || (nextType != QueryType.DDL && availableServers > 0)){
-            attendQuery(query);
+            return true;
         }
-        else{
-            //Lq: QueueSize change due to entry.
-            this.recordQueueChange(query,changeType.ENTRY);
-        }
+        return false;
 
     }
 
     @Override
-    public void processExit(Query query) {
-        double time = DBMS.getClock();
-        System.out.println("Connection " + query.getID() + " exited Transactional Storage Manager module");
-
-        //Adjust Statistics.
-        this.recordServiceChange(query,changeType.EXIT);
-
-        //Free servers
-        availableServers = (query.getQueryType() == QueryType.DDL) ? moduleCapacity : availableServers + 1;
-
-        //Attend someone from queue.
+    protected Query chooseNextClient() {
         Query anotherQuery = queue.peek();
         if (anotherQuery != null){
-            QueryType type = query.getQueryType();
+            QueryType type = anotherQuery.getQueryType();
             if (type != QueryType.DDL ){
                 this.attendQuery(anotherQuery);
-                queue.poll();
+                return queue.poll();
             }
             else if (availableServers == moduleCapacity){
                 this.attendQuery(anotherQuery);
-                queue.poll();
+                return queue.poll();
             }
         }
-        if ( !query.isTimeOut() ) {
-            nextModule.processArrival(query);
-        }
+        return null;
     }
 
+
     @Override
-    protected void attendQuery(Query query) {
-        double time = DBMS.getClock();
-        double duration = moduleCapacity*0.03 + 0.1*this.calculateBlocks(query);
-
-        //Query came from queue
-        if(query.isCurrentlyInQueue()){
-            //Lq: QueueSize change due to exit and change in Wq.
-            this.recordQueueChange(query,changeType.EXIT);
-        }
-        //Query was attended immediately.
-        //Ls: ServiceSize change due to entry, possible idleTime change.
-        this.recordServiceChange(query,changeType.ENTRY);
-
-        //Create ModuleEnd event.
-        Event event = new Event(EventType.MODULE_END, time + duration, query);
-        DBMS.addEvent(event);
-        availableServers = (query.getQueryType() == QueryType.DDL) ? 0 : availableServers - 1;
+    protected double calculateDuration(Query query) {
+        return moduleCapacity*0.03 + 0.1*this.calculateBlocks(query);
     }
 
     private int calculateBlocks(Query query){
