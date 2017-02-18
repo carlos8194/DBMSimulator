@@ -61,7 +61,7 @@ public class DBMSStatistics {
 
     public void calculateFinalStatistics(){
         for(ModuleStatistics statistics: moduleStatistics){
-            statistics.calculateFinalStatistics();
+            statistics.calculateFinalStatistics(time);
         }
         averageQueryLifeTime = averageQueryLifeTime/totalQueriesProcessed;
         for(double time: averageSelectTimes){time = time/numberOfSelects;}

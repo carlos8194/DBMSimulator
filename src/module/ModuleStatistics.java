@@ -7,10 +7,10 @@ public class ModuleStatistics {
     private Module module;
 
     //Performance Measures.
+    private int numberOfArrivals;
+
     private double averageSystemSize;// L = Lq + Ls
-    private double accumulatedQueueSize;// Used for calculating Lq
     private double averageQueueSize;// Lq
-    private double accumulatedServiceSize;// Used for calculating Ls
     private double averageServiceSize;// Ls
 
     private double averageResponseTime;// W= Wq + Ws
@@ -22,93 +22,32 @@ public class ModuleStatistics {
     private double arrivalRate;// lambda: λ
     private double serviceRate;// mu: μ
 
-    private double queueSizeChangeTime;
-    private double serviceSizeChangeTime;
     private double idleTime;
-
-    //Current Server State.
-    private int currentQueueSize;
-    private double totalQueueTime;
-    private int currentServiceSize;
-    private double totalServiceTime;
-    private int numberOfArrivals;
     private int queriesProcessed;
 
+    //Used internally at run time for calculating other statistics.
+    private double accumulatedQueueSize;// Used for calculating Lq
+    private double accumulatedServiceSize;// Used for calculating Ls
+    private double totalQueueTime;// Used for calculating Wq
+    private double totalServiceTime;// Used for calculating Ws
+    private double queueSizeChangeTime;
+    private double serviceSizeChangeTime;
+
+
+    private boolean finalStatisticsCalculated;
 
 
     public ModuleStatistics(Module module){
-        this.setModule(module);
+        this.module = module;
+        finalStatisticsCalculated = false;
     }
 
     public Module getModule() {
         return module;
     }
 
-    public void setModule(Module module) {
-        this.module = module;
-    }
 
-    public double getAverageSystemSize() {
-        averageSystemSize = averageQueueSize + averageServiceSize;
-        return averageSystemSize;
-    }
-
-
-    public double getAverageResponseTime() {
-        averageResponseTime = averageQueueTime + averageServiceTime;
-        return averageResponseTime;
-    }
-
-    //Falta limpiar
-
-    public double getAverageQueueTime() {
-        return averageQueueTime;
-    }
-
-    public void setAverageQueueTime(double averageQueueTime) {
-        this.averageQueueTime = averageQueueTime;
-    }
-
-    public double getAverageServiceTime() {
-        return averageServiceTime;
-    }
-
-    public void setAverageServiceTime(double averageServiceTime) {
-        this.averageServiceTime = averageServiceTime;
-    }
-
-    public boolean isStable(){
-        return stability;
-    }
-
-    public void setStability(boolean stability) {
-        this.stability = stability;
-    }
-
-    public double getOcupationRate() {
-        return ocupationRate;
-    }
-
-    public void setOcupationRate(double ocupationRate) {
-        this.ocupationRate = ocupationRate;
-    }
-
-    public double getArrivalRate() {
-        return arrivalRate;
-    }
-
-    public void setArrivalRate(double arrivalRate) {
-        this.arrivalRate = arrivalRate;
-    }
-
-    public double getServiceRate() {
-        return serviceRate;
-    }
-
-    public void setServiceRate(double serviceRate) {
-        this.serviceRate = serviceRate;
-    }
-
+    //Running time methods.
     public double getQueueSizeChangeTime() {
         return queueSizeChangeTime;
     }
@@ -117,29 +56,7 @@ public class ModuleStatistics {
         this.queueSizeChangeTime = queueSizeChangeTime;
     }
 
-    public int getCurrentQueueSize() {
-        return currentQueueSize;
-    }
-
-    public void setCurrentQueueSize(int currentQueueSize) {
-        this.currentQueueSize = currentQueueSize;
-    }
-
-    public int getCurrentServiceSize() {
-        return currentServiceSize;
-    }
-
-    public void setCurrentServiceSize(int currentServiceSize) {
-        this.currentServiceSize = currentServiceSize;
-    }
-
-    public int getQueriesProcessed() {
-        return queriesProcessed;
-    }
-
-    public void incrementQueriesProcessed() {
-        this.queriesProcessed++;
-    }
+    public void incrementQueriesProcessed() {this.queriesProcessed++;}
 
     public double getIdleTime() {
         return idleTime;
@@ -147,10 +64,6 @@ public class ModuleStatistics {
 
     public void incrementIdleTime(double idleTime) {
         this.idleTime += idleTime;
-    }
-
-    public int getNumberOfArrivals() {
-        return numberOfArrivals;
     }
 
     public void incrementNumberOfArrivals() {
@@ -165,16 +78,8 @@ public class ModuleStatistics {
         this.serviceSizeChangeTime = serviceSizeChangeTime;
     }
 
-    public double getTotalQueueTime() {
-        return totalQueueTime;
-    }
-
     public void incrementTotalQueueTime(double totalQueueTime) {
         this.totalQueueTime += totalQueueTime;
-    }
-
-    public double getTotalServiceTime() {
-        return totalServiceTime;
     }
 
     public void incrementTotalServiceTime(double totalServiceTime) {
@@ -197,14 +102,90 @@ public class ModuleStatistics {
         this.accumulatedServiceSize = accumulatedServiceSize;
     }
 
+
+
+
+    public void calculateFinalStatistics(double simulationRunningTime){
+        //Final Average Service time: Ws
+        averageServiceTime = totalServiceTime / queriesProcessed;
+        //Final Average Queue time: Wq
+        averageQueueTime = totalQueueTime / queriesProcessed;
+        //Final Average Response Time : W = Wq + Ws.
+        averageResponseTime = averageQueueTime + averageServiceTime;
+        //Final Average Queue Size: Lq
+        averageQueueSize = accumulatedQueueSize / simulationRunningTime;
+        //Final Average Service Size: Ls
+        averageServiceSize= accumulatedServiceSize / simulationRunningTime;
+        //Final Average System Size : L = Lq + Ls.
+        averageSystemSize = averageQueueSize + getAverageServiceSize();
+        //Final arrival rate.
+        arrivalRate = numberOfArrivals / simulationRunningTime;
+        //Final service rate.
+        serviceRate = queriesProcessed / simulationRunningTime;
+        //Final ocupation rate.
+        ocupationRate = arrivalRate / serviceRate;
+        //Final stability.
+        stability = (ocupationRate<1) ? true : false;
+        finalStatisticsCalculated = true;
+    }
+
+    //After final statistics are calculated this methods can be called.
+    public double getAverageQueueTime() {
+        assert(finalStatisticsCalculated);
+        return averageQueueTime;
+    }
+
+    public double getAverageServiceTime() {
+        assert(finalStatisticsCalculated);
+        return averageServiceTime;
+    }
+
+    public double getAverageResponseTime() {
+        assert(finalStatisticsCalculated);
+        return averageResponseTime;
+    }
+
     public double getAverageQueueSize() {
+        assert(finalStatisticsCalculated);
         return averageQueueSize;
     }
 
-    public void calculateFinalStatistics(){
-
-
+    public double getAverageServiceSize() {
+        assert(finalStatisticsCalculated);
+        return averageServiceSize;
     }
+
+    public double getAverageSystemSize() {
+        assert(finalStatisticsCalculated);
+        return averageSystemSize;
+    }
+
+    public double getOcupationRate() {
+        assert(finalStatisticsCalculated);
+        return ocupationRate;
+    }
+
+    public double getArrivalRate() {
+        assert(finalStatisticsCalculated);
+        return arrivalRate;
+    }
+
+    public double getServiceRate() {
+        assert(finalStatisticsCalculated);
+        return serviceRate;
+    }
+
+    public boolean isStable(){
+        assert(finalStatisticsCalculated);
+        return stability;
+    }
+
+    public double getTotalIdleTime(){
+        assert(finalStatisticsCalculated);
+        return idleTime;
+    }
+
+
 
 
 
