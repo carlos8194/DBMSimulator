@@ -55,7 +55,7 @@ public class Interface {
         info.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(null, "Version 1.1/nCreated by Carlos Luis Mellado Xatruch.");
+                JOptionPane.showMessageDialog(null, "Version 1.1\nCreated by Carlos Luis Mellado Xatruch.");
             }
         });
         infoMenu.add(info);
@@ -119,6 +119,8 @@ public class Interface {
         secondFrame.setLocation(200, 300);
         //secondFrame.setSize(1000, 4000);
         secondFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        secondFrame.pack();
         this.showSecondFrame();
     }
 
