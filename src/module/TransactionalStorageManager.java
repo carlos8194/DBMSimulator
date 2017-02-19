@@ -26,10 +26,10 @@ public class TransactionalStorageManager extends Module {
         QueryType type = query.getQueryType();
         QueryType nextType;
         if(queue.peek() != null){
-            nextType= queue.peek().getQueryType();
+            nextType = queue.peek().getQueryType();
         }
         else{
-            nextType=null;
+            nextType = null;
         }
         if((type == QueryType.DDL && availableServers == moduleCapacity) || (nextType != QueryType.DDL && availableServers > 0)){
             return true;
@@ -41,18 +41,14 @@ public class TransactionalStorageManager extends Module {
     @Override
     protected Query chooseNextClient() {
         Query anotherQuery = queue.peek();
+        Query returnQuery = null;
         if (anotherQuery != null){
             QueryType type = anotherQuery.getQueryType();
-            if (type != QueryType.DDL ){
-                this.attendQuery(anotherQuery);
-                return queue.poll();
-            }
-            else if (availableServers == moduleCapacity){
-                this.attendQuery(anotherQuery);
-                return queue.poll();
+            if (type != QueryType.DDL || availableServers == moduleCapacity){
+                returnQuery = queue.poll();
             }
         }
-        return null;
+        return returnQuery;
     }
 
 
@@ -71,7 +67,8 @@ public class TransactionalStorageManager extends Module {
                 B = ProbabilityDistributions.Uniform(1,64);
                 break;
         }
-        query.setBlocks( (int) B);
-        return (int) B;
+        int blocks = (int) B;
+        query.setBlocks(blocks);
+        return blocks;
     }
 }

@@ -1,29 +1,23 @@
 package module;
 
-import dbms.DBMS;
 import query.*;
 import utils.ProbabilityDistributions;
 import event.*;
-
 import java.util.ArrayDeque;
-
 
 /**
  * Created by Carlos on 03/02/2017.
  */
 public class ClientAdministrator extends Module {
 
-
     public ClientAdministrator(int k, Module next){
-        moduleNumber=0;
+        moduleNumber = 0;
         availableServers = k;
         moduleCapacity = k;
         this.nextModule = next;
         queue = new ArrayDeque<>();
         statistics = new ModuleStatistics(this);
     }
-
-
 
     public void returnQueryResult(Query query){
         //Calculate

@@ -13,7 +13,7 @@ public class ModuleStatistics {
     private double averageQueueSize;// Lq
     private double averageServiceSize;// Ls
 
-    private double averageResponseTime;// W= Wq + Ws
+    private double averageResponseTime;// W = Wq + Ws
     private double averageQueueTime;// Wq
     private double averageServiceTime;// Ws
 

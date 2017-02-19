@@ -30,15 +30,14 @@ public abstract class Module {
         QueryStatistics queryStatistics = query.getStatistics();
         queryStatistics.setModuleEntryTime(moduleNumber, time);
         statistics.incrementNumberOfArrivals();
-        if(moduleNumber==0) queryStatistics.setSystemArrivalTime(time);
+        if(moduleNumber == 0) queryStatistics.setSystemArrivalTime(time);
 
         //Attend if posible.
         if (this.attendImmediately(query)) this.attendQuery(query);
-        else if(moduleNumber==0) DBMS.incrementDiscartedConnections();
+        else if(moduleNumber == 0) DBMS.incrementDiscartedConnections();
         else {
             //Lq: QueueSize change due to entry.
             this.recordQueueChange(query, ChangeType.ENTRY);
-
         }
     }
 
@@ -92,7 +91,7 @@ public abstract class Module {
         }
         //Possibly kill connection
         if (!query.isTimeOut()) {
-            if(moduleNumber==4) ((ClientAdministrator)nextModule).returnQueryResult(query);
+            if(moduleNumber == 4) ((ClientAdministrator)nextModule).returnQueryResult(query);
             else nextModule.processArrival(query);
         }
     }
@@ -119,13 +118,13 @@ public abstract class Module {
     public void recordQueueChange(Query query, ChangeType changeType){
         double time = DBMS.getClock();
         //Lq: QueueSize change
-        double timeChange = statistics.getQueueSizeChangeTime()- time;
+        double timeChange = statistics.getQueueSizeChangeTime() - time;
         double currentAccumulate = statistics.getAccumulatedQueueSize();
-        statistics.setAccumulatedQueueSize(currentAccumulate + (queue.size()*timeChange));
+        statistics.setAccumulatedQueueSize(currentAccumulate + (queue.size() * timeChange));
         statistics.setQueueSizeChangeTime(time);
 
         QueryStatistics queryStatistics = query.getStatistics();
-        if(changeType== ChangeType.ENTRY) {
+        if(changeType == ChangeType.ENTRY) {
             query.setCurrentlyInQueue(true);
             queryStatistics.setQueueEntryTime(time);
             queue.add(query);
@@ -133,8 +132,8 @@ public abstract class Module {
         else{
             query.setCurrentlyInQueue(false);
             //Wq: TotalQueueTime change.
-            double queuetime = queryStatistics.getQueueEntryTime()-time;
-            queryStatistics.setModuleQueueTime(moduleNumber,queuetime);
+            double queuetime = queryStatistics.getQueueEntryTime() - time;
+            queryStatistics.setModuleQueueTime(moduleNumber, queuetime);
             statistics.incrementTotalQueueTime(queuetime);
         }
     }
@@ -149,10 +148,10 @@ public abstract class Module {
         statistics.setServiceSizeChangeTime(time);
 
         //Possible idleTime change.
-        if(changeType==changeType.ENTRY && availableServers == moduleCapacity){
+        if(changeType == ChangeType.ENTRY && availableServers == moduleCapacity){
             statistics.incrementIdleTime(timeChange);
         }
-        else if (changeType==changeType.EXIT){
+        else if (changeType == ChangeType.EXIT){
             QueryStatistics queryStatistics = query.getStatistics();
             queryStatistics.setModuleExitTime(moduleNumber,time);
             //Ws: average service time change.

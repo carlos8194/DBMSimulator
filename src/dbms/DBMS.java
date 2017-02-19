@@ -29,8 +29,8 @@ public class DBMS {
     //DBMS parameters
     private double totalRunningTime;
     private int concurrentConnections;//Module 1: ClientAdministrator k
-    private int availableProcesses;//Module 3: QueryProccesor n
-    private int simultaneousConsultations;//Module 4: TranasactionalStorageManager p
+    private int availableProcesses;//Module 3: Query Processor n
+    private int simultaneousConsultations;//Module 4: Transactional Storage Manager p
     private int parallelStatements;//Module 5: QueryExecutor m
     private double queryTimeoutTime;//DBMS: t
 
@@ -102,7 +102,7 @@ public class DBMS {
         Module currentModule = query.getCurrentModule();
         int moduleNumber = currentModule.getModuleNumber();
         currentModule.processExit(query);
-        dbmsStatistics.processModuleEnd(query,moduleNumber);
+        dbmsStatistics.processModuleEnd(query, moduleNumber);
     }
 
     private void processNewQuery() {
