@@ -1,5 +1,6 @@
 package module;
 
+import dbms.DBMS;
 import query.*;
 import utils.ProbabilityDistributions;
 import event.*;
@@ -11,12 +12,13 @@ import java.util.PriorityQueue;
  */
 public class TransactionalStorageManager extends Module {
 
-    public TransactionalStorageManager(int p, Module next){
+    public TransactionalStorageManager(DBMS dbms, int p){
+        DBMS = dbms;
         moduleNumber = 3;
         moduleCapacity = p;
         availableServers = p;
-        nextModule = next;
         queue = new PriorityQueue<>(Query::compareTo);
+        statistics = new ModuleStatistics(this);
     }
 
 

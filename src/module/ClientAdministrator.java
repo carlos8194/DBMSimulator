@@ -4,17 +4,18 @@ import query.*;
 import utils.ProbabilityDistributions;
 import event.*;
 import java.util.ArrayDeque;
+import dbms.DBMS;
 
 /**
  * Created by Carlos on 03/02/2017.
  */
 public class ClientAdministrator extends Module {
 
-    public ClientAdministrator(int k, Module next){
+    public ClientAdministrator(DBMS dbms, int k){
+        DBMS = dbms;
         moduleNumber = 0;
         availableServers = k;
         moduleCapacity = k;
-        this.nextModule = next;
         queue = new ArrayDeque<>();
         statistics = new ModuleStatistics(this);
     }
@@ -41,6 +42,7 @@ public class ClientAdministrator extends Module {
     @Override
     protected double calculateDuration(Query query) {
         return ProbabilityDistributions.Uniform(0.01, 0.05);
+
     }
 
     public void freeConnection(){

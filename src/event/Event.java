@@ -22,7 +22,7 @@ public class Event implements Comparable<Event> {
     }
 
     public int compareTo(Event event){
-        double comparison = getTime() - event.getTime();
+        double comparison = time - event.getTime();
         return (comparison >= 0) ? 1 : -1;
     }
 

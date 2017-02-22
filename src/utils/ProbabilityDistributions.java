@@ -6,7 +6,8 @@ package utils;
 public class ProbabilityDistributions {
 
     public static double Exponential(double mean){
-        return ( -1 / mean*Math.log1p( Math.random() ) );
+        return (-Math.log(Math.random()) / mean);
+
     }
 
     public static double Normal(double mean, double standardDeviation){

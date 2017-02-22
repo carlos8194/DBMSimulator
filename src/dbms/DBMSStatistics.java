@@ -45,7 +45,7 @@ public class DBMSStatistics {
     //8.Module Statistics.
     ModuleStatistics[] moduleStatistics;
 
-    public DBMSStatistics(double time,int k, int n, int p,int m, double t){
+    public DBMSStatistics(double time,int k, int n, int p,int m, double t, ModuleStatistics[] moduleStatistics){
         this.time = time;
         this.k = k;
         this.n = n;
@@ -56,6 +56,8 @@ public class DBMSStatistics {
         averageUpdateTimes = new double[5];
         averageJoinTimes = new double[5];
         averageDDLTimes = new double[5];
+        this.moduleStatistics = moduleStatistics;
+
 
     }
 

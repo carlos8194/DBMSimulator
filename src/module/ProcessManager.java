@@ -1,5 +1,6 @@
 package module;
 
+import dbms.DBMS;
 import query.*;
 import utils.ProbabilityDistributions;
 import event.*;
@@ -12,13 +13,14 @@ import java.util.ArrayDeque;
  */
 public class ProcessManager extends Module {
 
-    public ProcessManager(Module next) {
+    public ProcessManager(DBMS dbms) {
+        DBMS = dbms;
         moduleNumber = 1;
-        nextModule = next;
         queue = new ArrayDeque<>();
         availableServers = 1;
         moduleCapacity = 1;
         queue = new ArrayDeque<>();
+        statistics = new ModuleStatistics(this);
     }
 
 

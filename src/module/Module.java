@@ -1,5 +1,6 @@
 package module;
 
+import com.sun.org.apache.xpath.internal.operations.Mod;
 import event.Event;
 import event.EventType;
 import query.*;
@@ -60,7 +61,7 @@ public abstract class Module {
         DBMS.addEvent(event);
         //Occupy Servers
         switch(moduleNumber){
-            case 0: break;
+            //case 0: break;//??
             case 3: availableServers = (query.getQueryType() == QueryType.DDL) ? 0 : availableServers--;
                     break;
             default: availableServers--;
@@ -70,7 +71,7 @@ public abstract class Module {
 
     public void processExit(Query query) {
         double time = DBMS.getClock();
-        System.out.println("Connection " + query.getID() + " exited Process Manager module");
+        System.out.println("Connection " + query.getID() + " exited module " + moduleNumber );
 
         //Adjust Statistics.
         //Ls: ServiceSize change due to exit, number of queries increases.
@@ -162,6 +163,10 @@ public abstract class Module {
     }
 
     public int getModuleNumber(){return moduleNumber;}
+
+    public void setNextModule(Module module){nextModule = module;}
+
+    public ModuleStatistics getModuleStatistics(){return statistics;}
 
 }
 

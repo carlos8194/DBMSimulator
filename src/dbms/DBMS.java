@@ -44,6 +44,7 @@ public class DBMS {
         simultaneousConsultations = p;
         parallelStatements = m;
         queryTimeoutTime = t;
+
     }
 
     public void addEvent(Event event){
@@ -58,7 +59,7 @@ public class DBMS {
         eventList.add(firstArrival);
 
         //Run simulation
-        while(getClock() <totalRunningTime){
+        while(clock <totalRunningTime){
             //Get nextModule event
             Event currentEvent = eventList.poll();
             //Move clock to event time
@@ -78,14 +79,29 @@ public class DBMS {
 
     private void initializeDBMS() {
         //DBMS variables
-        dbmsStatistics = new DBMSStatistics(totalRunningTime,concurrentConnections,availableProcesses,simultaneousConsultations,parallelStatements,queryTimeoutTime);
         eventList= new PriorityQueue<>(Event::compareTo);
         //Modules
-        clientAdministrator = new ClientAdministrator(concurrentConnections, processManager);
-        processManager = new ProcessManager(queryProcessor);
-        queryProcessor = new QueryProcessor(availableProcesses,transactionalStorageManager);
-        transactionalStorageManager = new TransactionalStorageManager(simultaneousConsultations, queryExecutor);
-        queryExecutor = new QueryExecutor(parallelStatements, clientAdministrator);
+        clientAdministrator = new ClientAdministrator(this, concurrentConnections);
+        processManager = new ProcessManager(this);
+        queryProcessor = new QueryProcessor(this, availableProcesses);
+        transactionalStorageManager = new  TransactionalStorageManager(this, simultaneousConsultations);
+        queryExecutor = new QueryExecutor(this, parallelStatements);
+        clientAdministrator.setNextModule(processManager);
+        processManager.setNextModule(queryProcessor);
+        queryProcessor.setNextModule(transactionalStorageManager);
+        transactionalStorageManager.setNextModule(queryExecutor);
+        queryExecutor.setNextModule(clientAdministrator);
+
+        //Statistics
+        ModuleStatistics[] moduleStatistics = {
+                clientAdministrator.getModuleStatistics(),
+                processManager.getModuleStatistics(),
+                queryProcessor.getModuleStatistics(),
+                transactionalStorageManager.getModuleStatistics(),
+                queryExecutor.getModuleStatistics()
+        };
+        dbmsStatistics = new DBMSStatistics(totalRunningTime,concurrentConnections,availableProcesses,simultaneousConsultations,parallelStatements,queryTimeoutTime,moduleStatistics);
+
     }
 
     private void processQueryTimeout(Query query) {
@@ -107,9 +123,8 @@ public class DBMS {
 
     private void processNewQuery() {
         Query query = new Query();
-        query.getStatistics().setSystemArrivalTime(clock);
-        Event queryTimeOut = new Event(EventType.QUERY_TIMEOUT, queryTimeoutTime, query);
-        Event nextArrival = new Event(EventType.NEW_QUERY, ProbabilityDistributions.Exponential(35) );
+        Event queryTimeOut = new Event(EventType.QUERY_TIMEOUT, clock + queryTimeoutTime, query);
+        Event nextArrival = new Event(EventType.NEW_QUERY, clock + ProbabilityDistributions.Exponential(35) );
         eventList.add(nextArrival);
         eventList.add(queryTimeOut);
         clientAdministrator.processArrival(query);

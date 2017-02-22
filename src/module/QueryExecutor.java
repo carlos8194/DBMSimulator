@@ -1,5 +1,6 @@
 package module;
 
+import dbms.DBMS;
 import event.*;
 import query.Query;
 import query.QueryStatistics;
@@ -12,13 +13,14 @@ import java.util.ArrayDeque;
 public class QueryExecutor extends Module {
     private ClientAdministrator administrator;
 
-    public QueryExecutor(int m, Module next){
+    public QueryExecutor(DBMS dbms, int m){
+        DBMS = dbms;
         moduleNumber = 4;
         moduleCapacity = m;
         availableServers = m;
-        nextModule = next;
-        administrator = (ClientAdministrator) next;
+        administrator = (ClientAdministrator) nextModule;
         queue = new ArrayDeque<>();
+        statistics = new ModuleStatistics(this);
     }
 
     @Override
