@@ -21,6 +21,7 @@ public class ClientAdministrator extends Module {
     }
 
     public void returnQueryResult(Query query){
+        System.out.println("Query " + query.getID() + " exiting DBMS");
         //Calculate
         double time = DBMS.getClock() + (double) query.getBlocks() / 6.0;
 

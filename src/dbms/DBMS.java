@@ -36,7 +36,7 @@ public class DBMS {
 
 
 
-    public DBMS(int time,int k, int n, int p, int m, double t){
+    public DBMS(int time, int k, int n, int p, int m, double t){
         //DBMs parameters
         totalRunningTime = time;
         concurrentConnections = k;

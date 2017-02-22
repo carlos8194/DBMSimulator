@@ -9,7 +9,7 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args){
-        DBMS dbms = new DBMS(1500,15,3,2,1,15);
+        DBMS dbms = new DBMS(300, 15, 3, 2, 1, 300);
         dbms.runSimultation();
     }
 }

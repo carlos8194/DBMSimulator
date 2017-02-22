@@ -32,7 +32,10 @@ public class Interface {
         firstFrame.setLocation(200, 300);
         //firstFrame.setSize(1000, 4000);
         firstFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        firstFrame.setLayout(new FlowLayout());
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+        firstFrame.add(panel);
 
         JMenuBar menuBar = new JMenuBar();
         firstFrame.setJMenuBar(menuBar);
@@ -61,14 +64,14 @@ public class Interface {
         infoMenu.add(info);
 
         JLabel label = new JLabel("Please fill up the following parameters.");
-        JTextField iterationsText = new JTextField("Number of iterations");
-        JTextField maxTimeText = new JTextField("Max time per iteration");
-        JTextField delayTimeText = new JTextField("Delay time");
-        JTextField kText = new JTextField("k", 5);
-        JTextField nText = new JTextField("n", 5);
-        JTextField pText = new JTextField("p", 5);
-        JTextField mText = new JTextField("m", 5);
-        JTextField tText = new JTextField("Query Time Out");
+        JTextField iterationsText = new JTextField(5);
+        JTextField maxTimeText = new JTextField(5);
+        JTextField delayTimeText = new JTextField(5);
+        JTextField kText = new JTextField(5);
+        JTextField nText = new JTextField(5);
+        JTextField pText = new JTextField(5);
+        JTextField mText = new JTextField(5);
+        JTextField tText = new JTextField(5);
 
         JButton button = new JButton("Start simulation");
         button.addActionListener(new ActionListener() {
@@ -90,16 +93,57 @@ public class Interface {
                 //Missing code, boolean delay
             }
         });
-        firstFrame.add(label);
-        firstFrame.add(iterationsText);
-        firstFrame.add(maxTimeText);
-        firstFrame.add(delayTimeText);
-        firstFrame.add(kText);
-        firstFrame.add(nText);
-        firstFrame.add(pText);
-        firstFrame.add(mText);
-        firstFrame.add(tText);
-        firstFrame.add(button);
+        JPanel p1 = new JPanel();
+        p1.setLayout(new FlowLayout());
+        p1.add(new JLabel("Number of iterations"));
+        p1.add(iterationsText);
+
+        JPanel p2 = new JPanel();
+        p2.setLayout(new FlowLayout());
+        p2.add(new JLabel("Max time per iteration"));
+        p2.add(maxTimeText);
+
+        JPanel p3 = new JPanel();
+        p3.setLayout(new FlowLayout());
+        p3.add(new JLabel("Delay time"));
+        p3.add(delayTimeText);
+
+        JPanel p4 = new JPanel();
+        p4.setLayout(new FlowLayout());
+        p4.add(new JLabel("k"));
+        p4.add(kText);
+
+        JPanel p5 = new JPanel();
+        p5.setLayout(new FlowLayout());
+        p5.add(new JLabel("n"));
+        p5.add(nText);
+
+        JPanel p6 = new JPanel();
+        p6.setLayout(new FlowLayout());
+        p6.add(new JLabel("p"));
+        p6.add(pText);
+
+        JPanel p7 = new JPanel();
+        p7.setLayout(new FlowLayout());
+        p7.add(new JLabel("m"));
+        p7.add(mText);
+
+        JPanel p8 = new JPanel();
+        p8.setLayout(new FlowLayout());
+        p8.add(new JLabel("t"));
+        p8.add(tText);
+
+
+        panel.add(label);
+        panel.add(p1);
+        panel.add(p2);
+        panel.add(p3);
+        panel.add(p4);
+        panel.add(p5);
+        panel.add(p6);
+        panel.add(p7);
+        panel.add(p8);
+        panel.add(button);
 
         firstFrame.pack();
         this.showFirstFrame();
@@ -115,7 +159,7 @@ public class Interface {
 
     public void startSecondFrame(){
         firstFrame.setVisible(false);
-        secondFrame = new JFrame("DBMS Simulator running.");
+        secondFrame = new JFrame("DBMS Simulator running...");
         secondFrame.setLocation(200, 300);
         //secondFrame.setSize(1000, 4000);
         secondFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

@@ -110,6 +110,7 @@ public abstract class Module {
         if (query.isCurrentlyInQueue() ){
             queue.remove(query);
             this.recordQueueChange(query, ChangeType.EXIT);
+            System.out.println("Time is up for query " + query.getID() );
         }
         else {
             query.setTimeOut(true);
