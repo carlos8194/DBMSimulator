@@ -24,7 +24,7 @@ public abstract class Module {
 
     public void processArrival(Query query) {
         double time = DBMS.getClock();
-        System.out.println("Conecction " + query.getID() + " entered Module: " + moduleNumber);
+        System.out.println("Query " + query.getID() + " entered Module: " + moduleNumber +" at time:  "+time);
 
         //Adjust Statistics.
         query.setCurrentModule(this);
@@ -71,7 +71,7 @@ public abstract class Module {
 
     public void processExit(Query query) {
         double time = DBMS.getClock();
-        System.out.println("Connection " + query.getID() + " exited module " + moduleNumber );
+        System.out.println("Query " + query.getID() + " exited module " + moduleNumber +" at time:  "+time);
 
         //Adjust Statistics.
         //Ls: ServiceSize change due to exit, number of queries increases.

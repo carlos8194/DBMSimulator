@@ -1,5 +1,6 @@
 package query;
 
+import event.Event;
 import module.Module;
 
 /**
@@ -15,6 +16,7 @@ public class Query implements Comparable<Query> {
     private QueryStatistics statistics;
     private boolean timeOut;
     private int blocks;
+    private Event timeoutEvent;
 
     public Query(){
         double random = Math.random();
@@ -99,5 +101,13 @@ public class Query implements Comparable<Query> {
 
     public void setCurrentlyInQueue(boolean currentlyInQueue) {
         this.currentlyInQueue = currentlyInQueue;
+    }
+
+    public void setTimeoutEvent(Event timeoutEvent) {
+        this.timeoutEvent = timeoutEvent;
+    }
+
+    public Event getTimeoutEvent() {
+        return timeoutEvent;
     }
 }

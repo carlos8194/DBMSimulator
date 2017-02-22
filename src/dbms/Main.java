@@ -9,7 +9,9 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args){
-        DBMS dbms = new DBMS(300, 15, 3, 2, 1, 300);
-        dbms.runSimultation();
+        DBMS dbms = new DBMS(300, 15, 3, 2, 1, 20);
+        DBMSStatistics statistics = dbms.runSimultation();
+        System.out.println(statistics.getAverageQueryLifeTime());
+
     }
 }

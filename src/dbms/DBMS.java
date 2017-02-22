@@ -55,7 +55,7 @@ public class DBMS {
         //Initialize system
         initializeDBMS();
         clock = 0;
-        Event firstArrival = new Event(EventType.NEW_QUERY, ProbabilityDistributions.Exponential(35) );
+        Event firstArrival = new Event(EventType.NEW_QUERY, ProbabilityDistributions.Exponential(((35.0/60.0))) );
         eventList.add(firstArrival);
 
         //Run simulation
@@ -111,7 +111,7 @@ public class DBMS {
 
     private void processQueryReturn(Query query) {
         dbmsStatistics.processQueryReturn(query);
-        query.getStatistics().setSystemExitTime(clock);
+        eventList.remove(query.getTimeoutEvent());
     }
 
     private void processModuleEnd(Query query) {
@@ -124,7 +124,8 @@ public class DBMS {
     private void processNewQuery() {
         Query query = new Query();
         Event queryTimeOut = new Event(EventType.QUERY_TIMEOUT, clock + queryTimeoutTime, query);
-        Event nextArrival = new Event(EventType.NEW_QUERY, clock + ProbabilityDistributions.Exponential(35) );
+        query.setTimeoutEvent(queryTimeOut);
+        Event nextArrival = new Event(EventType.NEW_QUERY, clock + ProbabilityDistributions.Exponential(((35.0/60.0))) );
         eventList.add(nextArrival);
         eventList.add(queryTimeOut);
         clientAdministrator.processArrival(query);
