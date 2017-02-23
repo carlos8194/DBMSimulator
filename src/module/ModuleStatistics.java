@@ -18,7 +18,7 @@ public class ModuleStatistics {
     private double averageServiceTime;// Ws
 
     private boolean stability; // ρ = λ/μ
-    private double ocupationRate;//rho: ρ = λ/μ
+    private double occupationRate;//rho: ρ = λ/μ
     private double arrivalRate;// lambda: λ
     private double serviceRate;// mu: μ
 
@@ -46,7 +46,9 @@ public class ModuleStatistics {
         return module;
     }
 
-
+    public int getQueriesProcessed(){
+        return queriesProcessed;
+    }
     //Running time methods.
     public double getQueueSizeChangeTime() {
         return queueSizeChangeTime;
@@ -123,9 +125,9 @@ public class ModuleStatistics {
         //Final service rate.
         serviceRate = queriesProcessed / simulationRunningTime;
         //Final ocupation rate.
-        ocupationRate = arrivalRate / serviceRate;
+        occupationRate = arrivalRate / serviceRate;
         //Final stability.
-        stability = (ocupationRate<1) ? true : false;
+        stability = occupationRate < 1 ;
         finalStatisticsCalculated = true;
     }
 
@@ -160,9 +162,9 @@ public class ModuleStatistics {
         return averageSystemSize;
     }
 
-    public double getOcupationRate() {
+    public double getOccupationRate() {
         assert(finalStatisticsCalculated);
-        return ocupationRate;
+        return occupationRate;
     }
 
     public double getArrivalRate() {

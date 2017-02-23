@@ -3,6 +3,7 @@ package module;
 import com.sun.org.apache.xpath.internal.operations.Mod;
 import event.Event;
 import event.EventType;
+import interfaces.InterfaceNotification;
 import query.*;
 import dbms.DBMS;
 import utils.ProbabilityDistributions;
@@ -66,6 +67,7 @@ public abstract class Module {
                     break;
             default: availableServers--;
         }
+        DBMS.notifyInterface(InterfaceNotification.SERVER_STATE, moduleNumber, this.getOccupiedServers()+"");
 
     }
 
@@ -84,6 +86,7 @@ public abstract class Module {
                 break;
             default: availableServers++;
         }
+        DBMS.notifyInterface(InterfaceNotification.SERVER_STATE, moduleNumber, this.getOccupiedServers()+"");
 
         //Attend someone from queue.
         Query anotherQuery = this.chooseNextClient();
@@ -97,7 +100,9 @@ public abstract class Module {
         }
     }
 
-    protected Query chooseNextClient() {return queue.poll();}
+    protected Query chooseNextClient() {
+        DBMS.notifyInterface(InterfaceNotification.QUEUE_SIZE, moduleNumber, queue.size()-1+"");
+        return queue.poll();}
 
 
     protected abstract double calculateDuration(Query query);
@@ -130,6 +135,7 @@ public abstract class Module {
             query.setCurrentlyInQueue(true);
             queryStatistics.setQueueEntryTime(time);
             queue.add(query);
+            DBMS.notifyInterface(InterfaceNotification.QUEUE_SIZE, moduleNumber, queue.size()+"");
         }
         else{
             query.setCurrentlyInQueue(false);
@@ -145,7 +151,7 @@ public abstract class Module {
         //Ls: ServiceSize change due to entry.
         double timeChange = time - statistics.getServiceSizeChangeTime();
         double accumulatedServiceSize = statistics.getAccumulatedServiceSize();
-        int currentServiceSize = moduleCapacity- availableServers;
+        int currentServiceSize = moduleCapacity - availableServers;
         statistics.setAccumulatedServiceSize(accumulatedServiceSize + (timeChange*currentServiceSize));
         statistics.setServiceSizeChangeTime(time);
 
@@ -158,8 +164,8 @@ public abstract class Module {
             queryStatistics.setModuleExitTime(moduleNumber,time);
             //Ws: average service time change.
             statistics.incrementTotalServiceTime(queryStatistics.getModuleTime(moduleNumber));
-
             statistics.incrementQueriesProcessed();
+            DBMS.notifyInterface(InterfaceNotification.SERVED_CLIENTS, moduleNumber, statistics.getQueriesProcessed()+"");
         }
     }
 
@@ -168,6 +174,10 @@ public abstract class Module {
     public void setNextModule(Module module){nextModule = module;}
 
     public ModuleStatistics getModuleStatistics(){return statistics;}
+
+    public int getOccupiedServers(){
+        return moduleCapacity - availableServers;
+    }
 
 }
 

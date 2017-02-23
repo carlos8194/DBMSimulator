@@ -1,6 +1,8 @@
 package dbms;
 import event.Event;
 import event.EventType;
+import interfaces.Interface;
+import interfaces.InterfaceNotification;
 import module.*;
 import query.Query;
 import utils.ProbabilityDistributions;
@@ -28,15 +30,17 @@ public class DBMS {
 
     //DBMS parameters
     private double totalRunningTime;
-    private int concurrentConnections;//Module 1: ClientAdministrator k
-    private int availableProcesses;//Module 3: Query Processor n
-    private int simultaneousConsultations;//Module 4: Transactional Storage Manager p
-    private int parallelStatements;//Module 5: QueryExecutor m
+    private int concurrentConnections;//Module 0: ClientAdministrator k
+    private int availableProcesses;//Module 2: Query Processor n
+    private int simultaneousConsultations;//Module 3: Transactional Storage Manager p
+    private int parallelStatements;//Module 4: QueryExecutor m
     private double queryTimeoutTime;//DBMS: t
 
+    //Interface
+    private Interface anInterface;
 
 
-    public DBMS(int time, int k, int n, int p, int m, double t){
+    public DBMS(double time, int k, int n, int p, int m, double t, Interface anInterface){
         //DBMs parameters
         totalRunningTime = time;
         concurrentConnections = k;
@@ -44,6 +48,7 @@ public class DBMS {
         simultaneousConsultations = p;
         parallelStatements = m;
         queryTimeoutTime = t;
+        this.anInterface = anInterface;
 
     }
 
@@ -51,7 +56,7 @@ public class DBMS {
         eventList.add(event);
     }
 
-    public DBMSStatistics runSimultation(){
+    public DBMSStatistics runSimulation(){
         //Initialize system
         initializeDBMS();
         clock = 0;
@@ -62,8 +67,10 @@ public class DBMS {
         while(clock <totalRunningTime){
             //Get nextModule event
             Event currentEvent = eventList.poll();
+            anInterface.receiveNotification(InterfaceNotification.CURRENT_EVENT, -1, currentEvent.toString() );
             //Move clock to event time
             clock = currentEvent.getTime();
+            anInterface.receiveNotification(InterfaceNotification.CLOCK, -1, clock+"");
             //Process Event
             Query query = currentEvent.getQuery();
             switch(currentEvent.getType()){
@@ -125,7 +132,7 @@ public class DBMS {
         Query query = new Query();
         Event queryTimeOut = new Event(EventType.QUERY_TIMEOUT, clock + queryTimeoutTime, query);
         query.setTimeoutEvent(queryTimeOut);
-        Event nextArrival = new Event(EventType.NEW_QUERY, clock + ProbabilityDistributions.Exponential(((35.0/60.0))) );
+        Event nextArrival = new Event(EventType.NEW_QUERY, clock + ProbabilityDistributions.Exponential( ((35.0/60.0))) );
         eventList.add(nextArrival);
         eventList.add(queryTimeOut);
         clientAdministrator.processArrival(query);
@@ -134,8 +141,14 @@ public class DBMS {
     public double getClock() {
         return clock;
     }
+
     public void incrementDiscartedConnections(){
         dbmsStatistics.incrementDiscartedConnections();
+        anInterface.receiveNotification(InterfaceNotification.DISCARDED_CONNECTIONS, -1, dbmsStatistics.discartedConnections+"");
+    }
+
+    public void notifyInterface(InterfaceNotification notification, int m, String text){
+        anInterface.receiveNotification(notification, m, text);
     }
     
 }

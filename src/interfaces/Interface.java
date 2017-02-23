@@ -1,8 +1,12 @@
 package interfaces;
 
+import dbms.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
+import java.util.List;
+
 
 /**
  * Created by Rodrigo on 2/7/2017.
@@ -22,6 +26,8 @@ public class Interface {
     private int p;
     private int m;
     private double t;
+
+    private DBMS simulator;
 
     public Interface(){
         this.startFirstFrame();
@@ -90,7 +96,6 @@ public class Interface {
                 } catch (NumberFormatException ex){
                     JOptionPane.showMessageDialog(null, "Please write the numbers properly.");
                 }
-                //Missing code, boolean delay
             }
         });
         JPanel p1 = new JPanel();
@@ -133,6 +138,18 @@ public class Interface {
         p8.add(new JLabel("t"));
         p8.add(tText);
 
+        JPanel p9 = new JPanel();
+        p9.setLayout(new FlowLayout());
+        p9.add(new JLabel("Delay mode"));
+        JToggleButton toggleButton = new JToggleButton("OFF");
+        toggleButton.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent ev) {
+                delay = (ev.getStateChange() == ItemEvent.SELECTED);
+                if(delay) toggleButton.setText("ON");
+                else toggleButton.setText("OFF");
+            }
+        });
+        p9.add(toggleButton);
 
         panel.add(label);
         panel.add(p1);
@@ -143,6 +160,7 @@ public class Interface {
         panel.add(p6);
         panel.add(p7);
         panel.add(p8);
+        panel.add(p9);
         panel.add(button);
 
         firstFrame.pack();
@@ -163,9 +181,86 @@ public class Interface {
         secondFrame.setLocation(200, 300);
         //secondFrame.setSize(1000, 4000);
         secondFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        simulator = new DBMS(maxTime, k, n, p, m, t, this);
 
+        secondFrame.setLayout(new BorderLayout());
+
+        JPanel northPanel = new JPanel();
+        northPanel.setLayout(new FlowLayout());
+        northPanel.add(new JLabel("Iterations: "+iterations+" total time: "+maxTime+" k: "+k+" m: "+m+" n: "+n+" p: "+p+" t: "+t));
+
+        JPanel southPanel = new JPanel();
+        southPanel.setLayout(new FlowLayout());
+        JLabel clockLabel = new JLabel("clock: 0.0");
+        JLabel eventLabel = new JLabel("Current Event: ");
+        JLabel discardedConnectionsLabel = new JLabel("Discarded Connections: 0");
+        JLabel iterationNumberLabel = new JLabel("Iteration: ");
+        southPanel.add(clockLabel); southPanel.add(eventLabel); southPanel.add(discardedConnectionsLabel);
+        southPanel.add(iterationNumberLabel);
+
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new GridLayout());
+
+        JPanel mod0Panel = new JPanel();
+        mod0Panel.setLayout(new BoxLayout(mod0Panel, BoxLayout.PAGE_AXIS));
+        String serverState = "Ocuppied Servers: 0";
+        String queueSize = "Queue Size: 0";
+        String servedClients = "Served Clients: 0";
+        mod0Panel.add(new JLabel("Module 0:"));
+        mod0Panel.add(new JLabel(serverState)); mod0Panel.add(new JLabel(queueSize)); mod0Panel.add(new JLabel(servedClients));
+
+        JPanel mod1Panel = new JPanel();
+        mod1Panel.setLayout(new BoxLayout(mod1Panel, BoxLayout.PAGE_AXIS));
+        mod1Panel.add(new JLabel("Module 1:"));
+        mod1Panel.add(new JLabel(serverState)); mod1Panel.add(new JLabel(queueSize)); mod1Panel.add(new JLabel(servedClients));
+
+        JPanel mod2Panel = new JPanel();
+        mod2Panel.setLayout(new BoxLayout(mod2Panel, BoxLayout.PAGE_AXIS));
+        mod2Panel.add(new JLabel("Module 2:"));
+        mod2Panel.add(new JLabel(serverState)); mod2Panel.add(new JLabel(queueSize)); mod2Panel.add(new JLabel(servedClients));
+
+        JPanel mod3Panel = new JPanel();
+        mod3Panel.setLayout(new BoxLayout(mod3Panel, BoxLayout.PAGE_AXIS));
+        mod3Panel.add(new JLabel("Module 3:"));
+        mod3Panel.add(new JLabel(serverState)); mod3Panel.add(new JLabel(queueSize)); mod3Panel.add(new JLabel(servedClients));
+
+        JPanel mod4Panel = new JPanel();
+        mod4Panel.setLayout(new BoxLayout(mod4Panel, BoxLayout.PAGE_AXIS));
+        mod4Panel.add(new JLabel("Module 4:"));
+        mod4Panel.add(new JLabel(serverState)); mod4Panel.add(new JLabel(queueSize)); mod4Panel.add(new JLabel(servedClients));
+
+        centerPanel.add(mod0Panel); centerPanel.add(mod1Panel); centerPanel.add(mod2Panel);
+        centerPanel.add(mod3Panel); centerPanel.add(mod4Panel);
+
+        secondFrame.add(northPanel, BorderLayout.NORTH);
+        secondFrame.add(centerPanel, BorderLayout.CENTER);
+        secondFrame.add(southPanel, BorderLayout.SOUTH);
+
+        List<DBMSStatistics> list = new LinkedList<>();
         secondFrame.pack();
         this.showSecondFrame();
+        for (int i = 0; i < iterations; i++){
+            //clean frame
+            iterationNumberLabel.setText("Iteration: "+i+1);
+            list.add( simulator.runSimulation() );
+        }
+    }
+
+    public void receiveNotification(InterfaceNotification notification, int m, String text){
+        switch (notification){
+            case CURRENT_EVENT:
+                break;
+            case CLOCK:
+                break;
+            case DISCARDED_CONNECTIONS:
+                break;
+            case SERVER_STATE:
+                break;
+            case QUEUE_SIZE:
+                break;
+            case SERVED_CLIENTS:
+                break;
+        }
     }
 
 

@@ -1,6 +1,7 @@
 package module;
 
 import dbms.DBMS;
+import interfaces.InterfaceNotification;
 import query.*;
 import utils.ProbabilityDistributions;
 import event.*;
@@ -33,11 +34,7 @@ public class TransactionalStorageManager extends Module {
         else{
             nextType = null;
         }
-        if((type == QueryType.DDL && availableServers == moduleCapacity) || (nextType != QueryType.DDL && availableServers > 0)){
-            return true;
-        }
-        return false;
-
+        return  (type == QueryType.DDL && availableServers == moduleCapacity) || (nextType != QueryType.DDL && availableServers > 0);
     }
 
     @Override
@@ -48,6 +45,7 @@ public class TransactionalStorageManager extends Module {
             QueryType type = anotherQuery.getQueryType();
             if (type != QueryType.DDL || availableServers == moduleCapacity){
                 returnQuery = queue.poll();
+                DBMS.notifyInterface(InterfaceNotification.QUEUE_SIZE, moduleNumber, queue.size()+"");
             }
         }
         return returnQuery;

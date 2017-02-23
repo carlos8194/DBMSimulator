@@ -45,7 +45,7 @@ public class DBMSStatistics {
     //8.Module Statistics.
     ModuleStatistics[] moduleStatistics;
 
-    public DBMSStatistics(double time,int k, int n, int p,int m, double t, ModuleStatistics[] moduleStatistics){
+    public DBMSStatistics(double time,int k, int n, int p, int m, double t, ModuleStatistics[] moduleStatistics){
         this.time = time;
         this.k = k;
         this.n = n;

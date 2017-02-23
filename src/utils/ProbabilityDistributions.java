@@ -7,7 +7,6 @@ public class ProbabilityDistributions {
 
     public static double Exponential(double mean){
         return (-Math.log(Math.random()) / mean);
-
     }
 
     public static double Normal(double mean, double standardDeviation){

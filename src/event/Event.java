@@ -62,4 +62,11 @@ public class Event implements Comparable<Event> {
     public void setQuery(Query query) {
         this.query = query;
     }
+
+    @Override
+    public String toString() {
+        String string = "";
+        if (query != null) string += "Query "+query.getID();
+        return string + type.toString() + " at time: " + time;
+    }
 }
