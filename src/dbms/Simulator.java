@@ -12,12 +12,12 @@ import java.util.PriorityQueue;
 /**
  * Created by Rodrigo on 2/4/2017.
  */
-public class DBMS {
-    //DBMS variables
+public class Simulator {
+    //Simulator variables
     private double clock;
 
     //Simulation Statistics
-    DBMSStatistics dbmsStatistics;
+    SimulatorStatistics simulatorStatistics;
     //Event List
     private PriorityQueue<Event> eventList;
 
@@ -28,19 +28,19 @@ public class DBMS {
     private TransactionalStorageManager transactionalStorageManager;
     private QueryExecutor queryExecutor;
 
-    //DBMS parameters
+    //Simulator parameters
     private double totalRunningTime;
     private int concurrentConnections;//Module 0: ClientAdministrator k
     private int availableProcesses;//Module 2: Query Processor n
     private int simultaneousConsultations;//Module 3: Transactional Storage Manager p
     private int parallelStatements;//Module 4: QueryExecutor m
-    private double queryTimeoutTime;//DBMS: t
+    private double queryTimeoutTime;//Simulator: t
 
     //Interface
     private Interface anInterface;
 
 
-    public DBMS(double time, int k, int n, int p, int m, double t, Interface anInterface){
+    public Simulator(double time, int k, int n, int p, int m, double t, Interface anInterface){
         //DBMs parameters
         totalRunningTime = time;
         concurrentConnections = k;
@@ -56,7 +56,7 @@ public class DBMS {
         eventList.add(event);
     }
 
-    public DBMSStatistics runSimulation(){
+    public SimulatorStatistics runSimulation()  {
         //Initialize system
         initializeDBMS();
         clock = 0;
@@ -80,12 +80,12 @@ public class DBMS {
                 case QUERY_TIMEOUT: processQueryTimeout(query);break;
             }
         }
-        dbmsStatistics.calculateFinalStatistics();
-        return dbmsStatistics;
+        simulatorStatistics.calculateFinalStatistics();
+        return simulatorStatistics;
     }
 
     private void initializeDBMS() {
-        //DBMS variables
+        //Simulator variables
         eventList= new PriorityQueue<>(Event::compareTo);
         //Modules
         clientAdministrator = new ClientAdministrator(this, concurrentConnections);
@@ -107,7 +107,7 @@ public class DBMS {
                 transactionalStorageManager.getModuleStatistics(),
                 queryExecutor.getModuleStatistics()
         };
-        dbmsStatistics = new DBMSStatistics(totalRunningTime,concurrentConnections,availableProcesses,simultaneousConsultations,parallelStatements,queryTimeoutTime,moduleStatistics);
+        simulatorStatistics = new SimulatorStatistics(totalRunningTime,concurrentConnections,availableProcesses,simultaneousConsultations,parallelStatements,queryTimeoutTime,moduleStatistics);
 
     }
 
@@ -117,7 +117,7 @@ public class DBMS {
     }
 
     private void processQueryReturn(Query query) {
-        dbmsStatistics.processQueryReturn(query);
+        simulatorStatistics.processQueryReturn(query);
         eventList.remove(query.getTimeoutEvent());
     }
 
@@ -125,7 +125,7 @@ public class DBMS {
         Module currentModule = query.getCurrentModule();
         int moduleNumber = currentModule.getModuleNumber();
         currentModule.processExit(query);
-        dbmsStatistics.processModuleEnd(query, moduleNumber);
+        simulatorStatistics.processModuleEnd(query, moduleNumber);
     }
 
     private void processNewQuery() {
@@ -142,12 +142,12 @@ public class DBMS {
         return clock;
     }
 
-    public void incrementDiscartedConnections(){
-        dbmsStatistics.incrementDiscartedConnections();
-        anInterface.receiveNotification(InterfaceNotification.DISCARDED_CONNECTIONS, -1, dbmsStatistics.discartedConnections+"");
+    public void incrementDiscartedConnections()  {
+        simulatorStatistics.incrementDiscartedConnections();
+        anInterface.receiveNotification(InterfaceNotification.DISCARDED_CONNECTIONS, -1, simulatorStatistics.discartedConnections+"");
     }
 
-    public void notifyInterface(InterfaceNotification notification, int m, String text){
+    public void notifyInterface(InterfaceNotification notification, int m, String text)  {
         anInterface.receiveNotification(notification, m, text);
     }
     

@@ -1,10 +1,9 @@
 package module;
 
-import dbms.DBMS;
+import dbms.Simulator;
 import interfaces.InterfaceNotification;
 import query.*;
 import utils.ProbabilityDistributions;
-import event.*;
 
 import java.util.PriorityQueue;
 
@@ -13,7 +12,7 @@ import java.util.PriorityQueue;
  */
 public class TransactionalStorageManager extends Module {
 
-    public TransactionalStorageManager(DBMS dbms, int p){
+    public TransactionalStorageManager(Simulator dbms, int p){
         DBMS = dbms;
         moduleNumber = 3;
         moduleCapacity = p;

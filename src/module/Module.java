@@ -1,12 +1,10 @@
 package module;
 
-import com.sun.org.apache.xpath.internal.operations.Mod;
+import dbms.Simulator;
 import event.Event;
 import event.EventType;
 import interfaces.InterfaceNotification;
 import query.*;
-import dbms.DBMS;
-import utils.ProbabilityDistributions;
 
 import java.util.Queue;
 
@@ -15,7 +13,7 @@ import java.util.Queue;
  */
 public abstract class Module {
     protected int moduleNumber;
-    protected DBMS DBMS;
+    protected Simulator DBMS;
     protected ModuleStatistics statistics;
     protected int moduleCapacity;
     protected int availableServers;

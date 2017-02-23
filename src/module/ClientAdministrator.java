@@ -4,14 +4,14 @@ import query.*;
 import utils.ProbabilityDistributions;
 import event.*;
 import java.util.ArrayDeque;
-import dbms.DBMS;
+import dbms.Simulator;
 
 /**
  * Created by Carlos on 03/02/2017.
  */
 public class ClientAdministrator extends Module {
 
-    public ClientAdministrator(DBMS dbms, int k){
+    public ClientAdministrator(Simulator dbms, int k){
         DBMS = dbms;
         moduleNumber = 0;
         availableServers = k;
@@ -21,7 +21,7 @@ public class ClientAdministrator extends Module {
     }
 
     public void returnQueryResult(Query query){
-        System.out.println("Query " + query.getID() + " exiting DBMS");
+        System.out.println("Query " + query.getID() + " exiting Simulator");
         //Calculate
         double time = DBMS.getClock() + (double) query.getBlocks() / 6.0;
 

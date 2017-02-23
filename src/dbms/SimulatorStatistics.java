@@ -7,7 +7,7 @@ import query.*;
 /**
  * Created by Rodrigo on 2/4/2017.
  */
-public class DBMSStatistics {
+public class SimulatorStatistics {
     //General(Internal use)
     int numberOfSelects;
     int numberOfUpdates;
@@ -15,7 +15,7 @@ public class DBMSStatistics {
     int numberOfDDls;
     int totalQueriesProcessed;
 
-    //1.DBMS Parameters.
+    //1.Simulator Parameters.
     double time;
     int k;
     int n;
@@ -45,7 +45,7 @@ public class DBMSStatistics {
     //8.Module Statistics.
     ModuleStatistics[] moduleStatistics;
 
-    public DBMSStatistics(double time,int k, int n, int p, int m, double t, ModuleStatistics[] moduleStatistics){
+    public SimulatorStatistics(double time, int k, int n, int p, int m, double t, ModuleStatistics[] moduleStatistics){
         this.time = time;
         this.k = k;
         this.n = n;

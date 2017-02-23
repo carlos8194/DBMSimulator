@@ -27,14 +27,14 @@ public class Interface {
     private int m;
     private double t;
 
-    private DBMS simulator;
+    private Simulator simulator;
 
     public Interface(){
         this.startFirstFrame();
     }
 
     public void startFirstFrame(){
-        firstFrame = new JFrame("DBMS Simulator configuration.");
+        firstFrame = new JFrame("Simulator Simulator configuration.");
         firstFrame.setLocation(200, 300);
         //firstFrame.setSize(1000, 4000);
         firstFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -175,13 +175,13 @@ public class Interface {
         secondFrame.setVisible(true);
     }
 
-    public void startSecondFrame(){
+    public void startSecondFrame()  {
         firstFrame.setVisible(false);
-        secondFrame = new JFrame("DBMS Simulator running...");
+        secondFrame = new JFrame("Simulator Simulator running...");
         secondFrame.setLocation(200, 300);
         //secondFrame.setSize(1000, 4000);
         secondFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        simulator = new DBMS(maxTime, k, n, p, m, t, this);
+        simulator = new Simulator(maxTime, k, n, p, m, t, this);
 
         secondFrame.setLayout(new BorderLayout());
 
@@ -236,7 +236,7 @@ public class Interface {
         secondFrame.add(centerPanel, BorderLayout.CENTER);
         secondFrame.add(southPanel, BorderLayout.SOUTH);
 
-        List<DBMSStatistics> list = new LinkedList<>();
+        List<SimulatorStatistics> list = new LinkedList<>();
         secondFrame.pack();
         this.showSecondFrame();
         for (int i = 0; i < iterations; i++){
@@ -246,7 +246,7 @@ public class Interface {
         }
     }
 
-    public void receiveNotification(InterfaceNotification notification, int m, String text){
+    public void receiveNotification(InterfaceNotification notification, int m, String text)  {
         switch (notification){
             case CURRENT_EVENT:
                 break;
@@ -260,6 +260,9 @@ public class Interface {
                 break;
             case SERVED_CLIENTS:
                 break;
+        }
+        if(delay){
+            //this.wait((long)delayTime);
         }
     }
 

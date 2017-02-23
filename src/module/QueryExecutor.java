@@ -1,9 +1,7 @@
 package module;
 
-import dbms.DBMS;
-import event.*;
+import dbms.Simulator;
 import query.Query;
-import query.QueryStatistics;
 
 import java.util.ArrayDeque;
 
@@ -13,7 +11,7 @@ import java.util.ArrayDeque;
 public class QueryExecutor extends Module {
     private ClientAdministrator administrator;
 
-    public QueryExecutor(DBMS dbms, int m){
+    public QueryExecutor(Simulator dbms, int m){
         DBMS = dbms;
         moduleNumber = 4;
         moduleCapacity = m;

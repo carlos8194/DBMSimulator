@@ -1,9 +1,8 @@
 package module;
 
-import dbms.DBMS;
+import dbms.Simulator;
 import query.*;
 import utils.ProbabilityDistributions;
-import event.*;
 
 import java.util.ArrayDeque;
 
@@ -12,7 +11,7 @@ import java.util.ArrayDeque;
  */
 public  class QueryProcessor extends Module {
 
-    public QueryProcessor(DBMS dbms, int n){
+    public QueryProcessor(Simulator dbms, int n){
         DBMS = dbms;
         moduleNumber = 2;
         availableServers = n;
