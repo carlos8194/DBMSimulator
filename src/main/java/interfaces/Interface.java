@@ -28,7 +28,8 @@ public class Interface {
     private int m;
     private double t;
 
-    private int i = 1;
+    private static int i = 1;
+    private boolean simulationEnded = false;
     private Simulator simulator;
     private Map<String, JLabel> labelMap;
     private Map<String, JLabel> otherMap;
@@ -43,7 +44,6 @@ public class Interface {
     public void startFirstFrame(){
         firstFrame = new JFrame("DBMS Simulator configuration.");
         firstFrame.setLocation(200, 300);
-        //firstFrame.setSize(1000, 4000);
         firstFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel panel = new JPanel();
@@ -195,7 +195,6 @@ public class Interface {
     private void startSecondFrame()  {
         secondFrame = new JFrame("DBMS Simulator running...");
         secondFrame.setLocation(200, 300);
-        //secondFrame.setSize(1000, 4000);
         secondFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         secondFrame.setLayout(new BorderLayout());
 
@@ -213,7 +212,7 @@ public class Interface {
         southPanel.add(iterationNumberLabel);
 
         JPanel centerPanel = new JPanel();
-        centerPanel.setLayout(new GridLayout());
+        centerPanel.setLayout(new GridLayout(2,3,10,20));
 
         JPanel mod0Panel = new JPanel();
         mod0Panel.setLayout(new BoxLayout(mod0Panel, BoxLayout.PAGE_AXIS));
@@ -270,7 +269,7 @@ public class Interface {
     private void runSimulation(){
         if (delay) {
             labelMap.get("iterations").setText("  Iteration: "+ (i + 1) + "  ");
-            if (i != 1) this.cleanFrames(2);
+            if (i != 1) this.cleanFrames();
             this.showSecondFrame();
         }
         this.sleep();
@@ -306,6 +305,7 @@ public class Interface {
                 break;
         }
         this.setNewText(labelMap.get(name), newText);
+        secondFrame.pack();
         this.sleep();
     }
 
@@ -356,10 +356,11 @@ public class Interface {
         northPanel.setLayout(new FlowLayout());
         JLabel averageLifeTimeLabel = new JLabel("Average Query Lifetime: "); otherMap.put("averageLifeTime", averageLifeTimeLabel);
         JLabel discardedConnectionsLabel = new JLabel("Discarded Connections: ");otherMap.put("discardedConnections", discardedConnectionsLabel);
-        northPanel.add(averageLifeTimeLabel); northPanel.add(discardedConnectionsLabel);
+        JLabel iterationLabel = new JLabel("Iteration : "); otherMap.put("iterations", iterationLabel);
+        northPanel.add(iterationLabel); northPanel.add(averageLifeTimeLabel); northPanel.add(discardedConnectionsLabel);
 
         JPanel centerPanel = new JPanel();
-        centerPanel.setLayout(new GridLayout());
+        centerPanel.setLayout(new GridLayout(2,3,10,20));
 
         String averageQueueSize = "  Average Queue Size:   "; String idleTime = "  Idle time:   ";
         String DDLtime = "  DDL Lifetime:   "; String JOINtime = "  JOIN Lifetime:   ";
@@ -432,6 +433,10 @@ public class Interface {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (i <= iterations) runSimulation();
+                else {
+                    simulationEnded = true;
+                    hideThirdFrame();
+                }
             }
         });
         thirdFrame.add(northPanel, BorderLayout.NORTH);
@@ -442,8 +447,9 @@ public class Interface {
 
     private void updateThirdFrame(SimulatorStatistics statistics){
         //General statistics
-        this.setNewText(otherMap.get("averageLifetime"), statistics.getAverageQueryLifeTime()+"");
+        this.setNewText(otherMap.get("averageLifeTime"), statistics.getAverageQueryLifeTime()+"");
         this.setNewText(otherMap.get("discardedConnections"), statistics.getNumberOfDiscartedConnections()+"");
+        this.setNewText(otherMap.get("iterations"), i + "");
 
         //Average Queue Size per module
         this.setNewText(otherMap.get("mod0AverageQueueSize"), statistics.getAverageQueueSize(0)+"");
@@ -490,15 +496,20 @@ public class Interface {
         this.setNewText(otherMap.get("mod2UPDATEtime"), UPDATEtimes[2]+"");
         this.setNewText(otherMap.get("mod3UPDATEtime"), UPDATEtimes[3]+"");
         this.setNewText(otherMap.get("mod4UPDATEtime"), UPDATEtimes[4]+"");
+        thirdFrame.pack();
     }
 
-    private void cleanFrames(int frame){
-        Map<String, JLabel> map = (frame == 2) ? labelMap : otherMap;
-        Set<String> stringSet = map.keySet();
+    private void cleanFrames(){
+        Set<String> stringSet = labelMap.keySet();
         Iterator it = stringSet.iterator();
         while (it.hasNext()){
-            this.setNewText( map.get( it.next() ), "");
+            this.setNewText( labelMap.get( it.next() ), "");
         }
+        secondFrame.pack();
+    }
+
+    public boolean simulationHasEnded(){
+        return simulationEnded;
     }
 
 
