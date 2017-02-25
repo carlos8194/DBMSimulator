@@ -1,6 +1,9 @@
 package interfaces;
 
 import dbms.*;
+import module.ModuleStatistics;
+import query.QueryType;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -25,6 +28,7 @@ public class Interface {
     private int m;
     private double t;
 
+    private int i = 1;
     private Simulator simulator;
     private Map<String, JLabel> labelMap;
     private Map<String, JLabel> otherMap;
@@ -99,7 +103,9 @@ public class Interface {
                     initializeSimulator();
                     if (delay) startSecondFrame();
                     statisticsList = new LinkedList<>();
-                    startSimulation();
+                    if (delay) showSecondFrame();
+                    startThirdFrame();
+                    runSimulation();
                 } catch (NumberFormatException ex){
                     JOptionPane.showMessageDialog(null, "Please write the numbers properly.");
                 }
@@ -261,24 +267,20 @@ public class Interface {
         secondFrame.pack();
     }
 
-    private void startSimulation(){
-        if (delay) this.showSecondFrame();
-        this.startThirdFrame();
-        for (int i = 0; i < iterations; i++){
-            if (delay) {
-                labelMap.get("iterations").setText("  Iteration: "+ (i+1) + "  ");
-                if (i != 0) this.cleanFrames(2);
-                this.showSecondFrame();
-            }
-            this.sleep();
-            SimulatorStatistics statistics = simulator.runSimulation();
-            if (delay) this.hideSecondFrame();
-            statisticsList.add(statistics);
-            this.updateThirdFrame(statistics);
-            this.showThirdFrame();
-            this.sleep(10);
-            this.hideThirdFrame();
+    private void runSimulation(){
+        if (delay) {
+            labelMap.get("iterations").setText("  Iteration: "+ (i + 1) + "  ");
+            if (i != 1) this.cleanFrames(2);
+            this.showSecondFrame();
         }
+        this.sleep();
+        SimulatorStatistics statistics = simulator.runSimulation();
+        if (delay) this.hideSecondFrame();
+        statisticsList.add(statistics);
+        this.hideThirdFrame();
+        this.updateThirdFrame(statistics);
+        this.showThirdFrame();
+        i++;
     }
 
     public void receiveNotification(InterfaceNotification notification, int m, String newText)  {
@@ -303,11 +305,14 @@ public class Interface {
                 name = "mod" + m + "Clients";
                 break;
         }
-        JLabel label = labelMap.get(name);
+        this.setNewText(labelMap.get(name), newText);
+        this.sleep();
+    }
+
+    private void setNewText(JLabel label, String newText){
         String oldText = label.getText();
         int i = oldText.lastIndexOf(':');
         label.setText( "   " + oldText.substring(0, i + 1) + " " + newText + "  " );
-        this.sleep();
     }
 
     private void sleep(){
@@ -318,15 +323,6 @@ public class Interface {
                 System.out.println(e.getMessage() );
                 System.exit(1);
             }
-        }
-    }
-
-    private void sleep(int time){
-        try {
-            Thread.sleep( (long) time*1000);
-        }catch (InterruptedException e){
-            System.out.println(e.getMessage() );
-            System.exit(1);
         }
     }
 
@@ -431,13 +427,69 @@ public class Interface {
 
         centerPanel.add(mod0); centerPanel.add(mod1); centerPanel.add(mod2); centerPanel.add(mod3); centerPanel.add(mod4);
 
+        JButton button = new JButton("Proceed");
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (i <= iterations) runSimulation();
+            }
+        });
         thirdFrame.add(northPanel, BorderLayout.NORTH);
         thirdFrame.add(centerPanel, BorderLayout.CENTER);
+        thirdFrame.add(button, BorderLayout.SOUTH);
         thirdFrame.pack();
     }
 
     private void updateThirdFrame(SimulatorStatistics statistics){
+        //General statistics
+        this.setNewText(otherMap.get("averageLifetime"), statistics.getAverageQueryLifeTime()+"");
+        this.setNewText(otherMap.get("discardedConnections"), statistics.getNumberOfDiscartedConnections()+"");
 
+        //Average Queue Size per module
+        this.setNewText(otherMap.get("mod0AverageQueueSize"), statistics.getAverageQueueSize(0)+"");
+        this.setNewText(otherMap.get("mod1AverageQueueSize"), statistics.getAverageQueueSize(1)+"");
+        this.setNewText(otherMap.get("mod2AverageQueueSize"), statistics.getAverageQueueSize(2)+"");
+        this.setNewText(otherMap.get("mod3AverageQueueSize"), statistics.getAverageQueueSize(3)+"");
+        this.setNewText(otherMap.get("mod4AverageQueueSize"), statistics.getAverageQueueSize(4)+"");
+
+        //Idle time per module
+        this.setNewText(otherMap.get("mod0IdleTime"), statistics.getModuleIdleTime(0)+"");
+        this.setNewText(otherMap.get("mod1IdleTime"), statistics.getModuleIdleTime(1)+"");
+        this.setNewText(otherMap.get("mod2IdleTime"), statistics.getModuleIdleTime(2)+"");
+        this.setNewText(otherMap.get("mod3IdleTime"), statistics.getModuleIdleTime(3)+"");
+        this.setNewText(otherMap.get("mod4IdleTime"), statistics.getModuleIdleTime(4)+"");
+
+        //DDL Life time per module
+        double[] DDLtimes = statistics.getAverageTimesByQueryType(QueryType.DDL);
+        this.setNewText(otherMap.get("mod0DDLtime"), DDLtimes[0]+"");
+        this.setNewText(otherMap.get("mod1DDLtime"), DDLtimes[1]+"");
+        this.setNewText(otherMap.get("mod2DDLtime"), DDLtimes[2]+"");
+        this.setNewText(otherMap.get("mod3DDLtime"), DDLtimes[3]+"");
+        this.setNewText(otherMap.get("mod4DDLtime"), DDLtimes[4]+"");
+
+        //JOIN Life time per module
+        double[] JOINtimes = statistics.getAverageTimesByQueryType(QueryType.JOIN);
+        this.setNewText(otherMap.get("mod0JOINtime"), JOINtimes[0]+"");
+        this.setNewText(otherMap.get("mod1JOINtime"), JOINtimes[1]+"");
+        this.setNewText(otherMap.get("mod2JOINtime"), JOINtimes[2]+"");
+        this.setNewText(otherMap.get("mod3JOINtime"), JOINtimes[3]+"");
+        this.setNewText(otherMap.get("mod4JOINtime"), JOINtimes[4]+"");
+
+        //SELECT Life time per module
+        double[] SELECTtimes = statistics.getAverageTimesByQueryType(QueryType.SELECT);
+        this.setNewText(otherMap.get("mod0SELECTtime"), SELECTtimes[0]+"");
+        this.setNewText(otherMap.get("mod1SELECTtime"), SELECTtimes[1]+"");
+        this.setNewText(otherMap.get("mod2SELECTtime"), SELECTtimes[2]+"");
+        this.setNewText(otherMap.get("mod3SELECTtime"), SELECTtimes[3]+"");
+        this.setNewText(otherMap.get("mod4SELECTtime"), SELECTtimes[4]+"");
+
+        //UPDATE Life time per module
+        double[] UPDATEtimes = statistics.getAverageTimesByQueryType(QueryType.UPDATE);
+        this.setNewText(otherMap.get("mod0UPDATEtime"), UPDATEtimes[0]+"");
+        this.setNewText(otherMap.get("mod1UPDATEtime"), UPDATEtimes[1]+"");
+        this.setNewText(otherMap.get("mod2UPDATEtime"), UPDATEtimes[2]+"");
+        this.setNewText(otherMap.get("mod3UPDATEtime"), UPDATEtimes[3]+"");
+        this.setNewText(otherMap.get("mod4UPDATEtime"), UPDATEtimes[4]+"");
     }
 
     private void cleanFrames(int frame){
@@ -445,10 +497,7 @@ public class Interface {
         Set<String> stringSet = map.keySet();
         Iterator it = stringSet.iterator();
         while (it.hasNext()){
-            JLabel label = map.get(it.next());
-            String text = label.getText();
-            int i = text.lastIndexOf(':');
-            label.setText("  " + text.substring(0, i+1) + "   ");
+            this.setNewText( map.get( it.next() ), "");
         }
     }
 
