@@ -23,8 +23,6 @@ public abstract class Module {
 
     public void processArrival(Query query) {
         double time = DBMS.getClock();
-        System.out.println("Query " + query.getID() + " entered Module: " + moduleNumber +" at time:  "+time);
-
         //Adjust Statistics.
         query.setCurrentModule(this);
         QueryStatistics queryStatistics = query.getStatistics();
@@ -71,8 +69,6 @@ public abstract class Module {
 
     public void processExit(Query query) {
         double time = DBMS.getClock();
-        System.out.println("Query " + query.getID() + " exited module " + moduleNumber +" at time:  "+time);
-
         //Adjust Statistics.
         //Ls: ServiceSize change due to exit, number of queries increases.
         this.recordServiceChange(query, ChangeType.EXIT);
@@ -113,14 +109,13 @@ public abstract class Module {
         if (query.isCurrentlyInQueue() ){
             queue.remove(query);
             this.recordQueueChange(query, ChangeType.EXIT);
-            System.out.println("Time is up for query " + query.getID() );
         }
         else {
             query.setTimeOut(true);
         }
     }
 
-    public void recordQueueChange(Query query, ChangeType changeType){
+    private void recordQueueChange(Query query, ChangeType changeType){
         double time = DBMS.getClock();
         //Lq: QueueSize change
         double timeChange = statistics.getQueueSizeChangeTime() - time;
@@ -144,7 +139,7 @@ public abstract class Module {
         }
     }
 
-    public void recordServiceChange(Query query, ChangeType changeType){
+    private void recordServiceChange(Query query, ChangeType changeType){
         double time = DBMS.getClock();
         //Ls: ServiceSize change due to entry.
         double timeChange = time - statistics.getServiceSizeChangeTime();
@@ -173,7 +168,7 @@ public abstract class Module {
 
     public ModuleStatistics getModuleStatistics(){return statistics;}
 
-    public int getOccupiedServers(){
+    private int getOccupiedServers(){
         return moduleCapacity - availableServers;
     }
 

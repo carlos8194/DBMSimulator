@@ -1,8 +1,6 @@
 package dbms;
-import event.Event;
-import event.EventType;
-import interfaces.Interface;
-import interfaces.InterfaceNotification;
+import event.*;
+import interfaces.*;
 import module.*;
 import query.Query;
 import utils.ProbabilityDistributions;
@@ -35,12 +33,13 @@ public class Simulator {
     private int simultaneousConsultations;//Module 3: Transactional Storage Manager p
     private int parallelStatements;//Module 4: QueryExecutor m
     private double queryTimeoutTime;//Simulator: t
+    private boolean delayMode;
 
     //Interface
     private Interface anInterface;
 
 
-    public Simulator(double time, int k, int n, int p, int m, double t, Interface anInterface){
+    public Simulator(double time, int k, int n, int p, int m, double t, Interface anInterface, boolean delayMode){
         //DBMs parameters
         totalRunningTime = time;
         concurrentConnections = k;
@@ -49,6 +48,7 @@ public class Simulator {
         parallelStatements = m;
         queryTimeoutTime = t;
         this.anInterface = anInterface;
+        this.delayMode = delayMode;
 
     }
 
@@ -60,17 +60,17 @@ public class Simulator {
         //Initialize system
         initializeDBMS();
         clock = 0;
-        Event firstArrival = new Event(EventType.NEW_QUERY, ProbabilityDistributions.Exponential(((35.0/60.0))) );
+        Event firstArrival = new Event(EventType.NEW_QUERY, ProbabilityDistributions.Exponential(35.0/60.0) );
         eventList.add(firstArrival);
 
         //Run simulation
         while(clock <totalRunningTime){
             //Get nextModule event
             Event currentEvent = eventList.poll();
-            anInterface.receiveNotification(InterfaceNotification.CURRENT_EVENT, -1, currentEvent.toString() );
+            this.notifyInterface(InterfaceNotification.CURRENT_EVENT, -1, currentEvent.toString() );
             //Move clock to event time
             clock = currentEvent.getTime();
-            anInterface.receiveNotification(InterfaceNotification.CLOCK, -1, clock+"");
+            this.notifyInterface(InterfaceNotification.CLOCK, -1, clock+"");
             //Process Event
             Query query = currentEvent.getQuery();
             switch(currentEvent.getType()){
@@ -107,7 +107,7 @@ public class Simulator {
                 transactionalStorageManager.getModuleStatistics(),
                 queryExecutor.getModuleStatistics()
         };
-        simulatorStatistics = new SimulatorStatistics(totalRunningTime,concurrentConnections,availableProcesses,simultaneousConsultations,parallelStatements,queryTimeoutTime,moduleStatistics);
+        simulatorStatistics = new SimulatorStatistics(totalRunningTime, concurrentConnections, availableProcesses, simultaneousConsultations, parallelStatements, queryTimeoutTime, moduleStatistics);
 
     }
 
@@ -132,7 +132,7 @@ public class Simulator {
         Query query = new Query();
         Event queryTimeOut = new Event(EventType.QUERY_TIMEOUT, clock + queryTimeoutTime, query);
         query.setTimeoutEvent(queryTimeOut);
-        Event nextArrival = new Event(EventType.NEW_QUERY, clock + ProbabilityDistributions.Exponential( ((35.0/60.0))) );
+        Event nextArrival = new Event(EventType.NEW_QUERY, clock + ProbabilityDistributions.Exponential(35.0/60.0) );
         eventList.add(nextArrival);
         eventList.add(queryTimeOut);
         clientAdministrator.processArrival(query);
@@ -144,11 +144,13 @@ public class Simulator {
 
     public void incrementDiscartedConnections()  {
         simulatorStatistics.incrementDiscartedConnections();
-        anInterface.receiveNotification(InterfaceNotification.DISCARDED_CONNECTIONS, -1, simulatorStatistics.discartedConnections+"");
+        this.notifyInterface(InterfaceNotification.DISCARDED_CONNECTIONS, -1, simulatorStatistics.discartedConnections+"");
     }
 
     public void notifyInterface(InterfaceNotification notification, int m, String text)  {
-        anInterface.receiveNotification(notification, m, text);
+        if (delayMode) anInterface.receiveNotification(notification, m, text);
     }
+
+
     
 }

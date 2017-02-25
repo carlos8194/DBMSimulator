@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/DBMSimulator.iml" filepath="$PROJECT_DIR$/DBMSimulator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/DBMSimulator.iml" filepath="$PROJECT_DIR$/.idea/modules/DBMSimulator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/DBMSimulator_main.iml" filepath="$PROJECT_DIR$/.idea/modules/DBMSimulator_main.iml" group="DBMSimulator" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/DBMSimulator_test.iml" filepath="$PROJECT_DIR$/.idea/modules/DBMSimulator_test.iml" group="DBMSimulator" />
     </modules>
   </component>
 </project>

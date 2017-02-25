@@ -21,7 +21,6 @@ public class ClientAdministrator extends Module {
     }
 
     public void returnQueryResult(Query query){
-        System.out.println("Query " + query.getID() + " exiting Simulator");
         //Calculate
         double time = DBMS.getClock() + (double) query.getBlocks() / 6.0;
 
@@ -43,7 +42,6 @@ public class ClientAdministrator extends Module {
     @Override
     protected double calculateDuration(Query query) {
         return ProbabilityDistributions.Uniform(0.01, 0.05);
-
     }
 
     public void freeConnection(){
