@@ -4,6 +4,8 @@ import module.Module;
 import module.ModuleStatistics;
 import query.*;
 
+import java.util.List;
+
 /**
  * Created by Rodrigo on 2/4/2017.
  */
@@ -142,6 +144,11 @@ public class SimulatorStatistics {
     //8.Module Statistics.
     public ModuleStatistics getModuleStatistics(int moduleNumber){
         return moduleStatistics[moduleNumber];
+    }
+
+    //Global Statistics Method
+    public void calculateGlobalStatistics(List<SimulatorStatistics> statisticsList){
+        int numberOfIterations = statisticsList.size();
     }
 
 
