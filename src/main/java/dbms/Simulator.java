@@ -51,6 +51,17 @@ public class Simulator {
         this.delayMode = delayMode;
 
     }
+    public Simulator(double time, int k, int n, int p, int m, double t){
+        //DBMs parameters
+        totalRunningTime = time;
+        concurrentConnections = k;
+        availableProcesses = n;
+        simultaneousConsultations = p;
+        parallelStatements = m;
+        queryTimeoutTime = t;
+        this.delayMode = false;
+
+    }
 
     public void addEvent(Event event){
         eventList.add(event);

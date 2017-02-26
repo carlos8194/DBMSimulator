@@ -1,0 +1,99 @@
+<HTML>
+<HEAD>
+    <meta charset="UTF-8">
+    <TITLE>Index</TITLE>
+    <style>
+    table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+    }
+    th, td {
+    padding: 5px;
+    text-align: center;
+    }
+    </style>
+</HEAD>
+
+<body>
+    <header><h1>Index</h1></header>
+
+    <h2>Simulation Parameters</h2>
+    #set($iterations = $statistics.getNumberOfIterations())
+    <table>
+        <th>Parameter</th>
+        <th>Value</th>
+        <tr><th>Iterations</th><td>$iterations</td></tr>
+        <tr><th>Running Time</th><td>$statistics.getTime() s</td></tr>
+        <tr><th>k</th><td>$statistics.getK()</td></tr>
+        <tr><th>n</th><td>$statistics.getN()</td></tr>
+        <tr><th>p</th><td>$statistics.getP()</td></tr>
+        <tr><th>m</th><td>$statistics.getM()</td></tr>
+        <tr><th>t</th><td>$statistics.getT() s</td></tr>
+
+    </table>
+
+
+    <hr><hr>
+    <h2>Global Statistics</h2>
+
+
+
+    <h3>Average Query Lifetime</h3>
+    $statistics.getAverageQueryLifeTime() s
+    <h3>Discarted Connections</h3>
+    $statistics.getAverageDiscartedConnections()
+
+    <h3>Statistics By Module</h3>
+
+
+    #set($modules = ["Client Administrator","Process Manager","Query Processor","Transactional Storage Manager", "Query Executor"])
+    #set($queueSizes = $statistics.getAverageQueueSizes())
+    #set($idleTimes = $statistics.getAverageIdleTimes())
+
+        #set($DDLTimes = $statistics.getAverageTimesByQueryType($DDL))
+        #set($UpdateTimes = $statistics.getAverageTimesByQueryType($UPDATE))
+        #set($JoinTimes = $statistics.getAverageTimesByQueryType($JOIN))
+        #set($SelectTimes = $statistics.getAverageTimesByQueryType($SELECT))
+
+
+    <table>
+
+        <th>Module</th>
+        <th>Average Queue Size</th>
+        <th>Idle Time</th>
+        <th colspan="2">Time By Query Type</th>
+
+        #foreach( $i in [0..4] )
+            <tr>
+                <td rowspan="5">$modules[$i]</td>
+                <td rowspan="5">$queueSizes[$i]</td>
+                <td rowspan="5">$idleTimes[$i]</td>
+
+            <tr><td>DDL</td><td>$DDLTimes[$i]</td></tr>
+            <tr><td>Update</td><td>$UpdateTimes[$i]</td></tr>
+            <tr><td>Select</td><td>$SelectTimes[$i]</td></tr>
+            <tr><td>Join</td><td>$JoinTimes[$i]</td></tr>
+
+
+
+            </tr>
+
+        #end
+    </table>
+
+    <hr><hr>
+
+    <h3>Detailed Reports</h3>
+    <p>If you want to see the statistics report of an specific iteration run, click the link below.</p>
+    #set($html = ".html")
+        #foreach($it in [1..$iterations])
+            <p><a href="/DBMSimulator/src/statistics//iterations/iteration_$it$html">Iteration$it</a></p>
+        #end
+
+
+
+</body>
+
+
+
+</HTML>

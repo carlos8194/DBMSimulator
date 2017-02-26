@@ -1,0 +1,124 @@
+<HTML>
+<HEAD>
+    <meta charset="UTF-8">
+    <TITLE>Iteration $iteration</TITLE>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 5px;
+            text-align: center;
+        }
+    </style>
+</HEAD>
+
+<body>
+<header><h1>Iteration $iteration</h1></header>
+<a href="/DBMSimulator/src/statistics/index.html">Go back to Index</a>
+<h2>Simulation Parameters</h2>
+
+<table>
+    <th>Parameter</th>
+    <th>Value</th>
+    <tr><th>Iteration Number</th><td>$iteration</td></tr>
+    <tr><th>Running Time</th><td>$statistics.getTime() s</td></tr>
+    <tr><th>k</th><td>$statistics.getK()</td></tr>
+    <tr><th>n</th><td>$statistics.getN()</td></tr>
+    <tr><th>P</th><td>$statistics.getP()</td></tr>
+    <tr><th>m</th><td>$statistics.getM()</td></tr>
+    <tr><th>t</th><td>$statistics.getT() s</td></tr>
+
+</table>
+
+
+<hr><hr>
+<h2>Iteration $iteration Statistics</h2>
+
+
+
+<h3>Average Query Lifetime</h3>
+    $statistics.getAverageQueryLifeTime() s
+<h3>Discarted Connections</h3>
+    $statistics.getNumberOfDiscartedConnections()
+
+<h3>Statistics By Module</h3>
+
+
+    #set($modules = ["Client Administrator","Process Manager","Query Processor","Transactional Storage Manager","Query Executor"])
+
+
+    #set($DDLTimes = $statistics.getAverageTimesByQueryType($DDL))
+    #set($UpdateTimes = $statistics.getAverageTimesByQueryType($UPDATE))
+    #set($JoinTimes = $statistics.getAverageTimesByQueryType($JOIN))
+    #set($SelectTimes = $statistics.getAverageTimesByQueryType($SELECT))
+
+
+<table>
+    <th>Module</th>
+    <th>Average Queue Size</th>
+    <th>Idle Time</th>
+    <th colspan="2">Time By Query Type</th>
+
+    #foreach( $i in [0..4] )
+        <tr>
+            <td rowspan="5">$modules[$i]</td>
+            <td rowspan="5">$statistics.getAverageQueueSize($i)</td>
+            <td rowspan="5">$statistics.getModuleIdleTime($i)</td>
+
+        <tr><td>DDL</td><td>$DDLTimes[$i]</td></tr>
+        <tr><td>Update</td><td>$UpdateTimes[$i]</td></tr>
+        <tr><td>Select</td><td>$SelectTimes[$i]</td></tr>
+        <tr><td>Join</td><td>$JoinTimes[$i]</td></tr>
+        </tr>
+    #end
+</table>
+
+
+    #set($module0 = $statistics.getModuleStatistics(0))
+    #set($module1 = $statistics.getModuleStatistics(1))
+    #set($module2 = $statistics.getModuleStatistics(2))
+    #set($module3 = $statistics.getModuleStatistics(3))
+    #set($module4 = $statistics.getModuleStatistics(4))
+    #set($moduleStatistics =[$module0,$module1,$module2,$module3,$module4])
+<h3>Queueing Theory Statistics</h3>
+<table>
+    <th>Module</th>
+    <th>&lambda;</th>
+    <th>&mu;</th>
+    <th>&rho;</th>
+    <th>L</th>
+    <th>Lq</th>
+    <th>Ls</th>
+    <th>W</th>
+    <th>Wq</th>
+    <th>Ws</th>
+
+
+    #foreach( $i in [0..4])
+        <tr>
+            <th>$modules[$i]</th>
+            <td>$moduleStatistics[$i].getArrivalRate()</td>
+            <td>$moduleStatistics[$i].getServiceRate()</td>
+            <td>$moduleStatistics[$i].getOccupationRate()</td>
+            <td>$moduleStatistics[$i].getAverageSystemSize()</td>
+            <td>$moduleStatistics[$i].getAverageQueueSize()</td>
+            <td>$moduleStatistics[$i].getAverageServiceSize()</td>
+            <td>$moduleStatistics[$i].getAverageResponseTime()</td>
+            <td>$moduleStatistics[$i].getAverageQueueTime()</td>
+            <td>$moduleStatistics[$i].getAverageServiceTime()</td>
+
+        </tr>
+    #end
+</table>
+
+<hr><hr>
+
+
+
+</body>
+
+
+
+</HTML>

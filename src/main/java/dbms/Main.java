@@ -17,8 +17,7 @@ public class Main {
             statisticsList = anInterface.getStatisticsList();
             ready = anInterface.simulationHasEnded();
         }
-        SimulationReports reports = new SimulationReports();
-        reports.generateReports(statisticsList);
+
 
     }
 }

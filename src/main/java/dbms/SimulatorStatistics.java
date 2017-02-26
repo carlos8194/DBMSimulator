@@ -27,7 +27,7 @@ public class SimulatorStatistics {
 
 
     //3.Average Queue Size by Module. Contained in moduleStatistics.
-
+    double[] queueSizes;
     //4.Average Query Lifetime.
     double averageQueryLifeTime;
 
@@ -42,10 +42,13 @@ public class SimulatorStatistics {
 
 
     //7.Idle time by Module. Contained in ModuleStatistics.
-
+    double[] idleTimes;
 
     //8.Module Statistics.
     ModuleStatistics[] moduleStatistics;
+
+    private int numberOfIterations;
+    private List<SimulatorStatistics> statisticsList;
 
     public SimulatorStatistics(double time, int k, int n, int p, int m, double t, ModuleStatistics[] moduleStatistics){
         this.time = time;
@@ -59,9 +62,26 @@ public class SimulatorStatistics {
         averageJoinTimes = new double[5];
         averageDDLTimes = new double[5];
         this.moduleStatistics = moduleStatistics;
+    }
+    public SimulatorStatistics(double time, int k, int n, int p, int m, double t, List<SimulatorStatistics> statisticsList){
+        this.time = time;
+        this.k = k;
+        this.n = n;
+        this.p = p;
+        this.m = m;
+        this.t = t;
+        queueSizes = new double[5];
+        idleTimes = new double[5];
+        averageSelectTimes = new double[5];
+        averageUpdateTimes = new double[5];
+        averageJoinTimes = new double[5];
+        averageDDLTimes = new double[5];
+        this.statisticsList = statisticsList;
+        calculateGlobalStatistics();
 
 
     }
+
 
     public void calculateFinalStatistics(){
         for(ModuleStatistics statistics: moduleStatistics){
@@ -146,11 +166,84 @@ public class SimulatorStatistics {
         return moduleStatistics[moduleNumber];
     }
 
-    //Global Statistics Method
-    public void calculateGlobalStatistics(List<SimulatorStatistics> statisticsList){
-        int numberOfIterations = statisticsList.size();
+    public void calculateGlobalStatistics(){
+        numberOfIterations = statisticsList.size();
+
+        //Add all statistics.
+        for (SimulatorStatistics statistic: statisticsList) {
+            averageQueryLifeTime = averageQueryLifeTime + statistic.getAverageQueryLifeTime();
+            discartedConnections = discartedConnections + statistic.getNumberOfDiscartedConnections();
+            double [] select = statistic.getAverageTimesByQueryType(QueryType.SELECT);
+            double [] update = statistic.getAverageTimesByQueryType(QueryType.UPDATE);
+            double [] join = statistic.getAverageTimesByQueryType(QueryType.JOIN);
+            double [] ddl = statistic.getAverageTimesByQueryType(QueryType.DDL);
+
+            for (int i = 0; i <5 ; i++) {
+                queueSizes[i] += statistic.getAverageQueueSize(i);
+                idleTimes[i] += statistic.getModuleIdleTime(i);
+                averageSelectTimes[i] += select[i];
+                averageUpdateTimes[i] += update[i];
+                averageJoinTimes[i] += join[i];
+                averageDDLTimes[i] += ddl[i];
+            }
+        }
+
+        //Divide by number of iterations.
+        averageQueryLifeTime /= numberOfIterations;
+        discartedConnections /= numberOfIterations;
+        for (int i = 0; i <5 ; i++) {
+            queueSizes[i] /= numberOfIterations;
+            idleTimes[i] /= numberOfIterations;
+            averageSelectTimes[i] /= numberOfIterations;
+            averageUpdateTimes[i] /= numberOfIterations;
+            averageJoinTimes[i] /= numberOfIterations;
+            averageDDLTimes[i] /= numberOfIterations;
+        }
     }
 
+    public double getTime() {
+        return time;
+    }
+
+    public int getK() {
+        return k;
+    }
+
+    public int getN() {
+        return n;
+    }
+
+    public int getP() {
+        return p;
+    }
+
+    public int getM() {
+        return m;
+    }
+
+    public double getT() {return t;}
+
+    public double[] getAverageQueueSizes() {
+        return queueSizes;
+    }
+
+
+
+    public double getAverageDiscartedConnections() {
+        return discartedConnections;
+    }
+
+
+    public double[] getAverageIdleTimes() {
+        return idleTimes;
+    }
+
+    public int getNumberOfIterations() {
+        return numberOfIterations;
+    }
+
+    public List<SimulatorStatistics> getStatisticsList(){
+        return statisticsList;}
 
 
 
