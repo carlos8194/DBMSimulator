@@ -84,14 +84,18 @@ public class SimulatorStatistics {
 
 
     public void calculateFinalStatistics(){
-        for(ModuleStatistics statistics: moduleStatistics){
+        for (int i = 0; i <5 ; i++) {
+            ModuleStatistics statistics = moduleStatistics[i];
             statistics.calculateFinalStatistics(time);
+            queueSizes[i] = statistics.getAverageQueueSize();
+            idleTimes[i] = statistics.getIdleTime();
         }
         averageQueryLifeTime = averageQueryLifeTime/totalQueriesProcessed;
         for(double time: averageSelectTimes){time = time/numberOfSelects;}
         for(double time: averageDDLTimes){time = time/numberOfDDls;}
         for(double time: averageJoinTimes){time = time/numberOfJoins;}
         for(double time: averageUpdateTimes){time = time/numberOfUpdates;}
+
     }
 
 
@@ -131,8 +135,7 @@ public class SimulatorStatistics {
     //Final Statistics for report.
     //3.Average Queue Size.
     public double getAverageQueueSize(int moduleNumber){
-        ModuleStatistics statistics = moduleStatistics[moduleNumber];
-        return statistics.getAverageQueueSize();
+        return queueSizes[moduleNumber];
     }
     //4.Average Query Lifetime
     public double getAverageQueryLifeTime(){
@@ -158,7 +161,7 @@ public class SimulatorStatistics {
     }
     //7.Idle time by Module. Contained in ModuleStatistics.
     public double getModuleIdleTime(int moduleNumber){
-        return moduleStatistics[moduleNumber].getIdleTime();
+        return idleTimes[moduleNumber];
     }
 
     //8.Module Statistics.
