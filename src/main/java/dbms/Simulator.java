@@ -84,7 +84,7 @@ public class Simulator {
             currentEventAsString = currentEvent.toString();
             //Move clock to event time
             clock = currentEvent.getTime();
-            if (clock - time >= delayTime) {
+            if (clock - time >= delayTime && delayMode) {
                 anInterface.updateSecondFrame(simulatorStatistics);
                 time = clock;
             }
