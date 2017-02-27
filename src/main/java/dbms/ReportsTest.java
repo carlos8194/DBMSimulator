@@ -11,6 +11,8 @@ import java.util.List;
  */
 public class ReportsTest {
     public static void main(String[]args) throws Exception {
+        //System.out.println(System.getProperty("user.dir"));
+
         List<SimulatorStatistics> statisticsList = new LinkedList<>();
         Simulator dbms = new Simulator(15000,15,3,2,1,15);
         for (int i = 0; i < 20 ; i++) {

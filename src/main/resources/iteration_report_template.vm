@@ -1,7 +1,7 @@
-<HTML>
-<HEAD>
+<html>
+<head>
     <meta charset="UTF-8">
-    <TITLE>Iteration $iteration</TITLE>
+    <title>Iteration $iteration</title>
     <style>
         table, th, td {
             border: 1px solid black;
@@ -12,11 +12,11 @@
             text-align: center;
         }
     </style>
-</HEAD>
+</head>
 
 <body>
 <header><h1>Iteration $iteration</h1></header>
-<a href="/DBMSimulator/src/statistics/index.html">Go back to Index</a>
+<a href="../index.html">Go back to Index</a>
 <h2>Simulation Parameters</h2>
 
 <table>
@@ -58,12 +58,12 @@
 <table>
     <th>Module</th>
     <th>Average Queue Size</th>
-    <th>Idle Time</th>
+    <th>Average Idle Time</th>
     <th colspan="2">Time By Query Type</th>
 
     #foreach( $i in [0..4] )
         <tr>
-            <td rowspan="5">$modules[$i]</td>
+            <th rowspan="5">$modules[$i]</th>
             <td rowspan="5">$statistics.getAverageQueueSize($i)</td>
             <td rowspan="5">$statistics.getModuleIdleTime($i)</td>
 
@@ -121,4 +121,4 @@
 
 
 
-</HTML>
+</html>

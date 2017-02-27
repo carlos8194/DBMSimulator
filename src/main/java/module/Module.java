@@ -132,7 +132,7 @@ public abstract class Module {
     private void recordQueueChange(Query query, ChangeType changeType){
         double time = DBMS.getClock();
         //Lq: QueueSize change
-        double timeChange = statistics.getQueueSizeChangeTime() - time;
+        double timeChange = time - statistics.getQueueSizeChangeTime();
         double currentAccumulate = statistics.getAccumulatedQueueSize();
         statistics.setAccumulatedQueueSize(currentAccumulate + (queue.size() * timeChange));
         statistics.setQueueSizeChangeTime(time);
@@ -146,7 +146,7 @@ public abstract class Module {
         else{
             query.setCurrentlyInQueue(false);
             //Wq: TotalQueueTime change.
-            double queuetime = queryStatistics.getQueueEntryTime() - time;
+            double queuetime = time -  queryStatistics.getQueueEntryTime();
             queryStatistics.setModuleQueueTime(moduleNumber, queuetime);
             statistics.incrementTotalQueueTime(queuetime);
         }
