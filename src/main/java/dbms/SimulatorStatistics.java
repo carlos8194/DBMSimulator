@@ -11,41 +11,41 @@ import java.util.List;
  */
 public class SimulatorStatistics {
     //General(Internal use)
-    int numberOfSelects;
-    int numberOfUpdates;
-    int numberOfJoins;
-    int numberOfDDls;
-    int totalQueriesProcessed;
+    private int numberOfSelects;
+    private int numberOfUpdates;
+    private int numberOfJoins;
+    private int numberOfDDls;
+    private int totalQueriesProcessed;
 
     //1.Simulator Parameters.
-    double time;
-    int k;
-    int n;
-    int p;
-    int m;
-    double t;
+    private double time;
+    private int k;
+    private int n;
+    private int p;
+    private int m;
+    private double t;
 
 
     //3.Average Queue Size by Module. Contained in moduleStatistics.
-    double[] queueSizes;
+    private double[] queueSizes;
     //4.Average Query Lifetime.
-    double averageQueryLifeTime;
+    private double averageQueryLifeTime;
 
     //5.Number of discarted Connections.
-    int discartedConnections;
+    private int discartedConnections;
 
     //6.Average time spent on each Module by QueryType.
-    double[] averageSelectTimes;
-    double[] averageUpdateTimes;
-    double[] averageJoinTimes;
-    double[] averageDDLTimes;
+    private double[] averageSelectTimes;
+    private double[] averageUpdateTimes;
+    private double[] averageJoinTimes;
+    private double[] averageDDLTimes;
 
 
     //7.Idle time by Module. Contained in ModuleStatistics.
-    double[] idleTimes;
+    private double[] idleTimes;
 
     //8.Module Statistics.
-    ModuleStatistics[] moduleStatistics;
+    private ModuleStatistics[] moduleStatistics;
 
     private int numberOfIterations;
     private List<SimulatorStatistics> statisticsList;
@@ -80,8 +80,6 @@ public class SimulatorStatistics {
         averageDDLTimes = new double[5];
         this.statisticsList = statisticsList;
         calculateGlobalStatistics();
-
-
     }
 
 
@@ -231,8 +229,6 @@ public class SimulatorStatistics {
     public double[] getAverageQueueSizes() {
         return queueSizes;
     }
-
-
 
     public double getAverageDiscartedConnections() {
         return discartedConnections;

@@ -11,16 +11,24 @@ import java.util.Queue;
 /**
  * Created by Carlos on 03/02/2017.
  */
-public abstract class Module {
-    protected int moduleNumber;
-    protected Simulator DBMS;
-    protected ModuleStatistics statistics;
-    protected int moduleCapacity;
-    protected int availableServers;
-    protected Module nextModule;
-    protected Queue<Query> queue;
-    protected enum ChangeType {ENTRY,EXIT};
 
+/**
+ * General representation of a module.
+ */
+public abstract class Module {
+    protected int moduleNumber; //Unique number that correspond to a specific module
+    protected Simulator DBMS; //Pointer to the DBMS data base that possesses the modules
+    protected ModuleStatistics statistics; //An object that keeps track on the statistics
+    protected int moduleCapacity; //Max number of servers on this module
+    protected int availableServers; //Current number of servers available
+    protected Module nextModule; //Pointer to the next module object
+    protected Queue<Query> queue; //A queue that keeps queries that can not be attended right away
+    protected enum ChangeType {ENTRY,EXIT}; //A enum to identify if a query comes from or out of the queue
+
+    /**
+     * This method does basic things such as attending a client, setting statistics, add queries to the queue...
+     * @param query the one entering the module
+     */
     public void processArrival(Query query) {
         double time = DBMS.getClock();
         //Adjust Statistics.
@@ -39,6 +47,10 @@ public abstract class Module {
         }
     }
 
+    /**
+     * This method attends the query, sets the MODULE_END event, sets statistics and decreases the available servers.
+     * @param query: the one about to be attended.
+     */
     protected void attendQuery(Query query) {
         double time = DBMS.getClock();
         double duration = this.calculateDuration(query);
@@ -63,10 +75,14 @@ public abstract class Module {
                     break;
             default: availableServers--;
         }
-        DBMS.notifyInterface(InterfaceNotification.SERVER_STATE, moduleNumber, this.getOccupiedServers()+"");
 
     }
 
+    /**
+     * This method does things such as attending someone from the queue, free one or more servers, set statistics and
+     * send the query exiting to the next module.
+     * @param query: The one about to leave the module
+     */
     public void processExit(Query query) {
         double time = DBMS.getClock();
         //Adjust Statistics.
@@ -80,7 +96,6 @@ public abstract class Module {
                 break;
             default: availableServers++;
         }
-        DBMS.notifyInterface(InterfaceNotification.SERVER_STATE, moduleNumber, this.getOccupiedServers()+"");
 
         //Attend someone from queue.
         Query anotherQuery = this.chooseNextClient();
@@ -95,7 +110,6 @@ public abstract class Module {
     }
 
     protected Query chooseNextClient() {
-        DBMS.notifyInterface(InterfaceNotification.QUEUE_SIZE, moduleNumber, queue.size()-1+"");
         return queue.poll();}
 
 
@@ -128,7 +142,6 @@ public abstract class Module {
             query.setCurrentlyInQueue(true);
             queryStatistics.setQueueEntryTime(time);
             queue.add(query);
-            DBMS.notifyInterface(InterfaceNotification.QUEUE_SIZE, moduleNumber, queue.size()+"");
         }
         else{
             query.setCurrentlyInQueue(false);
@@ -158,7 +171,6 @@ public abstract class Module {
             //Ws: average service time change.
             statistics.incrementTotalServiceTime(queryStatistics.getModuleTime(moduleNumber));
             statistics.incrementQueriesProcessed();
-            DBMS.notifyInterface(InterfaceNotification.SERVED_CLIENTS, moduleNumber, statistics.getQueriesProcessed()+"");
         }
     }
 
@@ -168,8 +180,12 @@ public abstract class Module {
 
     public ModuleStatistics getModuleStatistics(){return statistics;}
 
-    private int getOccupiedServers(){
+    public int getOccupiedServers(){
         return moduleCapacity - availableServers;
+    }
+
+    public int getQueueSize(){
+        return queue.size();
     }
 
 }

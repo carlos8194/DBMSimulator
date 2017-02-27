@@ -1,6 +1,7 @@
 package interfaces;
 
 import dbms.*;
+import module.Module;
 import module.ModuleStatistics;
 import query.QueryType;
 
@@ -34,11 +35,11 @@ public class Interface {
     private Map<String, JLabel> labelMap;
     private Map<String, JLabel> otherMap;
     private List<SimulatorStatistics> statisticsList;
+    private SimulatorStatistics globalStatistics;
 
     public Interface(){
         labelMap = new HashMap<>();
         otherMap = new HashMap<>();
-        this.startFirstFrame();
     }
 
     public void startFirstFrame(){
@@ -181,7 +182,7 @@ public class Interface {
     }
 
     private void initializeSimulator(){
-        simulator = new Simulator(maxTime, k, n, p, m, t, this, delay);
+        simulator = new Simulator(maxTime, k, n, p, m, t, this, delay, delayTime);
     }
 
     private void showFirstFrame(){
@@ -267,46 +268,36 @@ public class Interface {
     }
 
     private void runSimulation(){
+        this.hideThirdFrame();
         if (delay) {
+            if (i != 1) this.cleanFrame();
             labelMap.get("iterations").setText("  Iteration: "+ (i + 1) + "  ");
-            if (i != 1) this.cleanFrames();
             this.showSecondFrame();
         }
         this.sleep();
         SimulatorStatistics statistics = simulator.runSimulation();
         if (delay) this.hideSecondFrame();
         statisticsList.add(statistics);
-        this.hideThirdFrame();
-        this.updateThirdFrame(statistics);
+        this.updateThirdFrame(statistics, i + "");
         this.showThirdFrame();
         i++;
     }
 
-    public void receiveNotification(InterfaceNotification notification, int m, String newText)  {
-        String name;
-        switch (notification){
-            case CURRENT_EVENT:
-                name = "event";
-                break;
-            case CLOCK:
-                name ="clock";
-                break;
-            case DISCARDED_CONNECTIONS:
-                name = "discardedConnections";
-                break;
-            case SERVER_STATE:
-                name = "mod" + m + "Server";
-                break;
-            case QUEUE_SIZE:
-                name = "mod" + m + "Queue";
-                break;
-            default:
-                name = "mod" + m + "Clients";
-                break;
+    public void updateSecondFrame(SimulatorStatistics statistics){
+        this.hideSecondFrame();
+        this.setNewText(labelMap.get("clock"), simulator.getClock()+"");
+        this.setNewText(labelMap.get("discardedConnections"), statistics.getNumberOfDiscartedConnections()+"");
+        this.setNewText(labelMap.get("event"), simulator.getCurrentEvent());
+
+        for (int j = 0; j < 5; j++){
+            ModuleStatistics moduleStatistics = statistics.getModuleStatistics(j);
+            Module module = moduleStatistics.getModule();
+            this.setNewText(labelMap.get("mod"+j+"Server"), module.getOccupiedServers()+"");
+            this.setNewText(labelMap.get("mod"+j+"Queue"), module.getQueueSize()+"");
+            this.setNewText(labelMap.get("mod"+j+"Clients"), moduleStatistics.getQueriesProcessed()+"");
         }
-        this.setNewText(labelMap.get(name), newText);
         secondFrame.pack();
-        this.sleep();
+        this.showSecondFrame();
     }
 
     private void setNewText(JLabel label, String newText){
@@ -318,9 +309,9 @@ public class Interface {
     private void sleep(){
         if(delay){
             try {
-                Thread.sleep( (long) delayTime*1000);
+                Thread.sleep( (long) 6*1000);
             }catch (InterruptedException e){
-                System.out.println(e.getMessage() );
+                System.out.println(e.getMessage());
                 System.exit(1);
             }
         }
@@ -328,6 +319,10 @@ public class Interface {
 
     public List<SimulatorStatistics> getStatisticsList(){
         return statisticsList;
+    }
+
+    public SimulatorStatistics getGlobalStatistics(){
+        return globalStatistics;
     }
 
     private void hideSecondFrame(){
@@ -433,6 +428,13 @@ public class Interface {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (i <= iterations) runSimulation();
+                else if (i == iterations + 1){
+                    globalStatistics = new SimulatorStatistics(maxTime, k, n, p, m, t, statisticsList);
+                    hideThirdFrame();
+                    updateThirdFrame(globalStatistics, "average");
+                    showThirdFrame();
+                    ++i;
+                }
                 else {
                     simulationEnded = true;
                     hideThirdFrame();
@@ -445,20 +447,22 @@ public class Interface {
         thirdFrame.pack();
     }
 
-    private void updateThirdFrame(SimulatorStatistics statistics){
+    private void updateThirdFrame(SimulatorStatistics statistics, String iteration){
         //General statistics
         this.setNewText(otherMap.get("averageLifeTime"), statistics.getAverageQueryLifeTime()+"");
         this.setNewText(otherMap.get("discardedConnections"), statistics.getNumberOfDiscartedConnections()+"");
-        this.setNewText(otherMap.get("iterations"), i + "");
+        this.setNewText(otherMap.get("iterations"), iteration);
 
         //Average Queue Size per module
-        this.setNewText(otherMap.get("mod0AverageQueueSize"), statistics.getAverageQueueSize(0)+"");
-        this.setNewText(otherMap.get("mod1AverageQueueSize"), statistics.getAverageQueueSize(1)+"");
-        this.setNewText(otherMap.get("mod2AverageQueueSize"), statistics.getAverageQueueSize(2)+"");
-        this.setNewText(otherMap.get("mod3AverageQueueSize"), statistics.getAverageQueueSize(3)+"");
-        this.setNewText(otherMap.get("mod4AverageQueueSize"), statistics.getAverageQueueSize(4)+"");
+        double[] averageQueueSizes = statistics.getAverageQueueSizes();
+        this.setNewText(otherMap.get("mod0AverageQueueSize"), averageQueueSizes[0]+"");
+        this.setNewText(otherMap.get("mod1AverageQueueSize"), averageQueueSizes[1]+"");
+        this.setNewText(otherMap.get("mod2AverageQueueSize"), averageQueueSizes[2]+"");
+        this.setNewText(otherMap.get("mod3AverageQueueSize"), averageQueueSizes[3]+"");
+        this.setNewText(otherMap.get("mod4AverageQueueSize"), averageQueueSizes[4]+"");
 
         //Idle time per module
+        //double[] idleTimes = statistics.getAverageIdleTimes();
         this.setNewText(otherMap.get("mod0IdleTime"), statistics.getModuleIdleTime(0)+"");
         this.setNewText(otherMap.get("mod1IdleTime"), statistics.getModuleIdleTime(1)+"");
         this.setNewText(otherMap.get("mod2IdleTime"), statistics.getModuleIdleTime(2)+"");
@@ -499,7 +503,7 @@ public class Interface {
         thirdFrame.pack();
     }
 
-    private void cleanFrames(){
+    private void cleanFrame(){
         Set<String> stringSet = labelMap.keySet();
         Iterator it = stringSet.iterator();
         while (it.hasNext()){

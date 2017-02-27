@@ -44,7 +44,6 @@ public class TransactionalStorageManager extends Module {
             QueryType type = anotherQuery.getQueryType();
             if (type != QueryType.DDL || availableServers == moduleCapacity){
                 returnQuery = queue.poll();
-                DBMS.notifyInterface(InterfaceNotification.QUEUE_SIZE, moduleNumber, queue.size()+"");
             }
         }
         return returnQuery;

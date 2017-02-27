@@ -15,7 +15,7 @@ public class Simulator {
     private double clock;
 
     //Simulation Statistics
-    SimulatorStatistics simulatorStatistics;
+    private SimulatorStatistics simulatorStatistics;
     //Event List
     private PriorityQueue<Event> eventList;
 
@@ -34,12 +34,13 @@ public class Simulator {
     private int parallelStatements;//Module 4: QueryExecutor m
     private double queryTimeoutTime;//Simulator: t
     private boolean delayMode;
+    private double delayTime;
 
     //Interface
     private Interface anInterface;
+    private String currentEventAsString;
 
-
-    public Simulator(double time, int k, int n, int p, int m, double t, Interface anInterface, boolean delayMode){
+    public Simulator(double time, int k, int n, int p, int m, double t, Interface anInterface, boolean delayMode, double delayTime){
         //DBMs parameters
         totalRunningTime = time;
         concurrentConnections = k;
@@ -49,8 +50,9 @@ public class Simulator {
         queryTimeoutTime = t;
         this.anInterface = anInterface;
         this.delayMode = delayMode;
-
+        this.delayTime = delayTime;
     }
+
     public Simulator(double time, int k, int n, int p, int m, double t){
         //DBMs parameters
         totalRunningTime = time;
@@ -73,15 +75,19 @@ public class Simulator {
         clock = 0;
         Event firstArrival = new Event(EventType.NEW_QUERY, ProbabilityDistributions.Exponential(35.0/60.0) );
         eventList.add(firstArrival);
+        double time = clock;
 
         //Run simulation
-        while(clock <totalRunningTime){
+        while(clock < totalRunningTime){
             //Get nextModule event
             Event currentEvent = eventList.poll();
-            this.notifyInterface(InterfaceNotification.CURRENT_EVENT, -1, currentEvent.toString() );
+            currentEventAsString = currentEvent.toString();
             //Move clock to event time
             clock = currentEvent.getTime();
-            this.notifyInterface(InterfaceNotification.CLOCK, -1, clock+"");
+            if (clock - time >= delayTime) {
+                anInterface.updateSecondFrame(simulatorStatistics);
+                time = clock;
+            }
             //Process Event
             Query query = currentEvent.getQuery();
             switch(currentEvent.getType()){
@@ -155,12 +161,12 @@ public class Simulator {
 
     public void incrementDiscartedConnections()  {
         simulatorStatistics.incrementDiscartedConnections();
-        this.notifyInterface(InterfaceNotification.DISCARDED_CONNECTIONS, -1, simulatorStatistics.discartedConnections+"");
     }
 
-    public void notifyInterface(InterfaceNotification notification, int m, String text)  {
-        if (delayMode) anInterface.receiveNotification(notification, m, text);
+    public String getCurrentEvent(){
+        return currentEventAsString;
     }
+
 
 
     

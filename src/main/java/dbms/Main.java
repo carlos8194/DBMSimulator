@@ -3,7 +3,7 @@ package dbms;
 import interfaces.Interface;
 import interfaces.SimulationReports;
 
-import java.util.*;
+import java.util.List;
 /**
  * Created by Carlos on 18/02/2017.
  */
@@ -11,13 +11,15 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         Interface anInterface = new Interface();
+        anInterface.startFirstFrame();
         boolean ready = false;
-        List<SimulatorStatistics> statisticsList = new LinkedList<>();
+        List<SimulatorStatistics> statisticsList = null;
+        SimulatorStatistics globalStatistics = null;
         while (!ready) {
-            statisticsList = anInterface.getStatisticsList();
             ready = anInterface.simulationHasEnded();
+            statisticsList = anInterface.getStatisticsList();
+            globalStatistics = anInterface.getGlobalStatistics();
         }
-
 
     }
 }
