@@ -57,6 +57,8 @@ public class SimulatorStatistics {
         this.p = p;
         this.m = m;
         this.t = t;
+        queueSizes = new double[5];
+        idleTimes = new double[5];
         averageSelectTimes = new double[5];
         averageUpdateTimes = new double[5];
         averageJoinTimes = new double[5];
