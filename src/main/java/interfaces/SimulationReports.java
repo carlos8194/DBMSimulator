@@ -1,6 +1,7 @@
 package interfaces;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.List;
 import dbms.SimulatorStatistics;
 
@@ -13,24 +14,52 @@ import query.QueryType;
 
 
 /**
- * Created by Rodrigo on 2/7/2017.
+ * This class is in charge of generating the simulation reports that contain both the global statistics and an individual
+ * page that details an individual iteration statistic.
+ * It implements one method which builds the index and displays the global statistics and another method which generates
+ * all the individual iteration's report.
+ *
  */
 public class SimulationReports {
 
+    /**
+     * Class constructor.
+     */
     public SimulationReports(){}
 
-    public void generateReports(SimulatorStatistics statistics) throws Exception {
+    /**
+     * This is the main method called to generate the statistics reports, it uses the apache velocity template engine
+     * and calls to different methods to create the index and the individual reports.
+     * It creates and  stores the statistics in the /src/statistics/ folder.
+     * It obtains the templates from the /src/resources folder.
+     * @param globalStatistics the object conatining the simulation's statistics.
+     * @throws Exception if there is any problem creating the folder or reports.
+     */
+    public void generateReports(SimulatorStatistics globalStatistics) throws Exception {
         VelocityEngine velocityEngine = new VelocityEngine();
         velocityEngine.init();
-        FileUtils.cleanDirectory(new File("./src/statistics/"));
-        generateIndex(statistics, velocityEngine);
+        File statisticsFolder = new File("./src/statistics/");
+        if(statisticsFolder.exists()) {
+            FileUtils.cleanDirectory(statisticsFolder);
+        }
+        else {
+            statisticsFolder.mkdir();
+        }
+        generateIndex(globalStatistics, velocityEngine);
         File iterations = new File("./src/statistics/iterations");
         iterations.mkdir();
-        generateIndividualReports(statistics, velocityEngine);
+        generateIndividualReports(globalStatistics, velocityEngine);
 
 
     }
 
+    /**
+     * This is the method which creates the index page. The index displays the simulation global statistics and contains
+     * a link to each iteration individual report.
+     * @param globalStatistics the object containing the simulation's statistics.
+     * @param velocityEngine the template engine used to create the index html page
+     * @throws IOException if there is any problem saving the file or retrieving the template from resources.
+     */
     private void generateIndex(SimulatorStatistics globalStatistics, VelocityEngine velocityEngine) throws IOException {
         Template indexTemplate = velocityEngine.getTemplate( "./src/main/resources/index_template.vm" );
         VelocityContext context = new VelocityContext();
@@ -47,6 +76,14 @@ public class SimulationReports {
         outputStream.close();
     }
 
+    /**
+     * This method creates each individual iteration statistics report. The individual report displays the global stadistics
+     * as well as the specific iteration report of perfomance measures.
+     * It obtains a list with each simulation iteration run from the globalStatistics received as a parameter.
+     * @param globalStatistics the object containing the simulation's statistics.
+     * @param velocityEngine the template engine used to create the reports html pages.
+     * @throws IOException if there is any problem saving the file or retrieving the template from resources.
+     */
     private void generateIndividualReports(SimulatorStatistics globalStatistics, VelocityEngine velocityEngine) throws IOException {
         List<SimulatorStatistics> statisticsList = globalStatistics.getStatisticsList();
         Template indexTemplate = velocityEngine.getTemplate( "./src/main/resources/iteration_report_template.vm" );

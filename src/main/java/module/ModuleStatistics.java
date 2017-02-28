@@ -207,7 +207,7 @@ public class ModuleStatistics {
         finalStatisticsCalculated = true;
     }
 
-    //After final statistics are calculated this methods can be called.
+    //After final statistics are calculated these methods can be called.
 
     /**
      * Returns the amount of queries this module served during the simulation.
@@ -307,7 +307,7 @@ public class ModuleStatistics {
 
     /**
      * Returns true if this module's occupation rate was less than 1 during this simulation iteration, false otherwise.
-     * @return stability
+     * @return
      */
     public boolean isStable(){
         assert(finalStatisticsCalculated);

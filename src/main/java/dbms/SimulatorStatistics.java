@@ -60,12 +60,12 @@ public class SimulatorStatistics {
     /**
      * This class constructor is used when the object is intended to hold the dbms statistics of a specific iteration run.
      * It receives an array containing the statistics of each module.
-     * @param time
-     * @param k
-     * @param n
-     * @param p
-     * @param m
-     * @param t
+     * @param time: total running time per iteration.
+     * @param k: Servers in the Client Administrator module.
+     * @param n: Servers in the Query Processor module.
+     * @param p: Servers in the Transactional Storage Manager module.
+     * @param m: Servers in the Query Executor module.
+     * @param t: Time out per query.
      * @param moduleStatistics each module statistics as an array.
      */
     public SimulatorStatistics(double time, int k, int n, int p, int m, double t, ModuleStatistics[] moduleStatistics){
@@ -87,12 +87,12 @@ public class SimulatorStatistics {
     /**
      * This class constructor is used when the object is intended to contain the average statistics of the whole simulation.
      * It automatically calls the method for calculating the global statistics.
-     * @param time
-     * @param k
-     * @param n
-     * @param p
-     * @param m
-     * @param t
+     * @param time: total running time per iteration.
+     * @param k: Servers in the Client Administrator module.
+     * @param n: Servers in the Query Processor module.
+     * @param p: Servers in the Transactional Storage Manager module.
+     * @param m: Servers in the Query Executor module.
+     * @param t: Time out per query.
      * @param statisticsList list of each iteration statistics.
      */
     public SimulatorStatistics(double time, int k, int n, int p, int m, double t, List<SimulatorStatistics> statisticsList){
@@ -122,6 +122,7 @@ public class SimulatorStatistics {
     /**
      * Running time statistic, processes a query return by adding its lifetime to the average and increasing the amount
      * of queries processed by the system
+     * @param query query that just returned.
      */
     public void processQueryReturn(Query query) {
         averageQueryLifeTime += query.getStatistics().getQueryLifeTime();
@@ -132,6 +133,8 @@ public class SimulatorStatistics {
      * Running time statistic, processes a query module end by adding the time spent at this module to the average and
      * increasing the amount of queries processed of its specific QueryType.
      * of queries processed by the system
+     * @param query query that exited the module
+     * @param moduleNumber module identifier
      */
     public void processModuleEnd(Query query, int moduleNumber) {
         QueryType queryType = query.getQueryType();
@@ -158,7 +161,7 @@ public class SimulatorStatistics {
 
     //Final Statistics for report.
     /**
-     * When used as an individual iteration statistics class, this methods does some final calculation on each varaiable
+     * When used as an individual iteration statistics class, this method does some final calculation on each varaiable
      * so that the final statistic is ready to be presented by the get methods. It also calls the calculateFinalStatistic
      * method of each module, so that every moduleStatistic is ready to be presented as well.
      */
@@ -180,8 +183,8 @@ public class SimulatorStatistics {
     //3.Average Queue Size.
     /**
      * When used as an individual iteration statistics class, returns the averageSize of the queue of the module specified
-     * by the moduleNumber parameter, in this iteration
-     * @param moduleNumber
+     * by the moduleNumber parameter, in this iteration.
+     * @param moduleNumber module identifier.
      * @return module's average queueSize.
      */
     public double getAverageQueueSize(int moduleNumber){
@@ -235,9 +238,9 @@ public class SimulatorStatistics {
     //7.Idle time by Module. Contained in ModuleStatistics.
     /**
      * When used as an individual iteration statistics class, returns the amount of time the module specified by the
-     * moduleNumber parameter was idle
-     * @param moduleNumber
-     * @return idleTime
+     * moduleNumber parameter was idle.
+     * @param moduleNumber module identifier.
+     * @return idleTime amount of time the module was idle.
      */
     public double getModuleIdleTime(int moduleNumber){
         return idleTimes[moduleNumber];
@@ -247,7 +250,7 @@ public class SimulatorStatistics {
     /**
      * When used as an individual iteration statistics class, returns the module's statistic specified by the
      * moduleNumber parameter
-     * @param moduleNumber
+     * @param moduleNumber module identifier.
      * @return ModuleStatistics
      */
     public ModuleStatistics getModuleStatistics(int moduleNumber){
@@ -383,7 +386,7 @@ public class SimulatorStatistics {
 
     /**
      * Returns the amount of time after which a query is killed.
-     * @return
+     * @return t
      */
     public double getT() {return t;}
 

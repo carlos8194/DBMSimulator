@@ -20,7 +20,7 @@ public class QueryStatistics {
     /**
      * This constructor method simply initializes the arrays used for storing times and asocciates the statistics with
      * an specific query.
-     * @param query
+     * @param query query asocciated to these statistics.
      */
     public QueryStatistics(Query query){
         this.query = query;
