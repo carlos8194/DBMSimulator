@@ -6,21 +6,31 @@ import query.Query;
 import java.util.ArrayDeque;
 
 /**
- * Created by Rodrigo on 2/7/2017.
+ * Module number 4. It is in charge of the process of loading blocks to memory and executing the corresponding algorithm
+ * based on the queries content. It has a max "m" module capacity.
  */
 public class QueryExecutor extends Module {
-    private ClientAdministrator administrator;
 
+    /**
+     * Query Executor constructor.
+     * @param dbms: The simulator object that manages the modules.
+     * @param m: this modules capacity.
+     */
     public QueryExecutor(Simulator dbms, int m){
         DBMS = dbms;
         moduleNumber = 4;
         moduleCapacity = m;
         availableServers = m;
-        administrator = (ClientAdministrator) nextModule;
         queue = new ArrayDeque<>();
         statistics = new ModuleStatistics(this);
     }
 
+    /**
+     * It calculates the duration of service based on the the queries type and the number of blocks that are going to
+     * be loaded to memory.
+     * @param query: The object to which service is going to be given.
+     * @return service time duration as a double value.
+     */
     @Override
     protected double calculateDuration(Query query){
         double duration;

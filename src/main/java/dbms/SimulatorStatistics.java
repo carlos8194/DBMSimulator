@@ -7,7 +7,7 @@ import query.*;
 import java.util.List;
 
 /**
- * This class handles the statistics relating to the whole dbms simulation.
+ * This class handles the statistics related to the whole dbms simulation.
  * The class can be used as the statistics of an individual iteration, creating one each iteration, or it can be used
  * as the global simulation statistics, calculating the average of the variables from  a list of all the iterations
  * statistics.

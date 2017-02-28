@@ -3,15 +3,9 @@ package module;
 import dbms.Simulator;
 import event.Event;
 import event.EventType;
-import interfaces.InterfaceNotification;
 import query.*;
 
 import java.util.Queue;
-
-/**
- * Created by Carlos on 03/02/2017.
- */
-
 /**
  * General representation of a module.
  */
@@ -109,16 +103,38 @@ public abstract class Module {
         }
     }
 
+    /**
+     * This is the general version of how a module chooses the next client, the Transactional Storage Manager overrides
+     * it with its own implementation and the Client Administrator by always returning null (because it does not have a
+     * queue).
+     * @return The next client Query object.
+     */
     protected Query chooseNextClient() {
         return queue.poll();}
 
 
+    /**
+     * Each module implement this abstract method with according to their service time patterns.
+     * @param query: The object to which service is going to be given.
+     * @return Service time as a double value.
+     */
     protected abstract double calculateDuration(Query query);
 
+    /**
+     * This is the general test to know if a query should be attended or be sent to the queue.
+     * Only the Transactional Storage Manager overrides it.
+     * @param query: The query that could possibly be attended.
+     * @return true if the query can be attended right away, false otherwise.
+     */
     protected boolean attendImmediately(Query query) {
         return availableServers > 0;
     }
 
+    /**
+     * This method handles the query time out events sent by the interface, by removing them from the queue (if thats
+     * where they are), or by setting up their timeOut flag if they are currently in service.
+     * @param query: The Query whose time is over.
+     */
     public  void queryTimeout(Query query){
         if (query.isCurrentlyInQueue() ){
             queue.remove(query);
@@ -129,6 +145,12 @@ public abstract class Module {
         }
     }
 
+    /**
+     * This method is called when a Query interacts with the queue, by setting up the ModuleStatistics from this, and
+     * setting the queries flag, and in case of an ENTRY, it also adds the query to the queue.
+     * @param query: The query that comes from or goes to the queue.
+     * @param changeType: ENTRY : Goes to the queue. EXIT : Comes from the queue.
+     */
     private void recordQueueChange(Query query, ChangeType changeType){
         double time = DBMS.getClock();
         //Lq: QueueSize change
@@ -152,6 +174,12 @@ public abstract class Module {
         }
     }
 
+    /**
+     * This method is called when a Query interacts with service, by setting up the ModuleStatistics from this, and
+     * setting the queries statistics.
+     * @param query: The query that comes from or goes to service.
+     * @param changeType: ENTRY : Goes to service. EXIT : Comes from service.
+     */
     private void recordServiceChange(Query query, ChangeType changeType){
         double time = DBMS.getClock();
         //Ls: ServiceSize change due to entry.
@@ -174,16 +202,35 @@ public abstract class Module {
         }
     }
 
+    /**
+     * This modules own id number.
+     * @return An integer that works as this modules id.
+     */
     public int getModuleNumber(){return moduleNumber;}
 
+    /**
+     * Setter method for the modules next.
+     * @param module: The new next of this module.
+     */
     public void setNextModule(Module module){nextModule = module;}
 
+    /**
+     * Getter method for this modules statistics.
+     * @return: this modules statistics object.
+     */
     public ModuleStatistics getModuleStatistics(){return statistics;}
 
+    /**
+     * Calculates the servers that are currently attending someone.
+     * @return The number of occupied servers.
+     */
     public int getOccupiedServers(){
         return moduleCapacity - availableServers;
     }
 
+    /**
+     * @return The amount of queries currently in queue.
+     */
     public int getQueueSize(){
         return queue.size();
     }

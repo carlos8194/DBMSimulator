@@ -182,7 +182,7 @@ public class Interface {
     }
 
     private void initializeSimulator(){
-        simulator = new Simulator(maxTime, k, n, p, m, t, this, delay, delayTime);
+        simulator = new Simulator(maxTime, k, n, p, m, t, this, delay);
     }
 
     private void showFirstFrame(){

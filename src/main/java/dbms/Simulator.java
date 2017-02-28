@@ -8,7 +8,8 @@ import utils.ProbabilityDistributions;
 import java.util.PriorityQueue;
 
 /**
- * Created by Rodrigo on 2/4/2017.
+ * This is the most important class of the project, it holds the logic of the simulation, and interacts with all
+ * modules, entering queries and the interface.
  */
 public class Simulator {
     //Simulator variables
@@ -16,6 +17,7 @@ public class Simulator {
 
     //Simulation Statistics
     private SimulatorStatistics simulatorStatistics;
+
     //Event List
     private PriorityQueue<Event> eventList;
 
@@ -38,9 +40,22 @@ public class Simulator {
 
     //Interface
     private Interface anInterface;
+
+    //A String representation of the current event, used to notify the interface of what is currently happening.
     private String currentEventAsString;
 
-    public Simulator(double time, int k, int n, int p, int m, double t, Interface anInterface, boolean delayMode, double delayTime){
+    /**
+     * Simulator constructor.
+     * @param time: total running time per iteration.
+     * @param k: Servers in the Client Administrator module.
+     * @param n: Servers in the Query Processor module.
+     * @param p: Servers in the Transactional Storage Manager module.
+     * @param m: Servers in the Query Executor module.
+     * @param t: Time out per query.
+     * @param anInterface: a pointer to the interface directing the application.
+     * @param delayMode: Whether delay mode is active in the interface or not.
+     */
+    public Simulator(double time, int k, int n, int p, int m, double t, Interface anInterface, boolean delayMode){
         //DBMs parameters
         totalRunningTime = time;
         concurrentConnections = k;
@@ -50,7 +65,6 @@ public class Simulator {
         queryTimeoutTime = t;
         this.anInterface = anInterface;
         this.delayMode = delayMode;
-        this.delayTime = delayTime;
     }
 
     public Simulator(double time, int k, int n, int p, int m, double t){
@@ -65,10 +79,20 @@ public class Simulator {
 
     }
 
+    /**
+     * This method adds an event to the Simulators event queue. Modules need as they process queries.
+     * @param event: The event to be added.
+     */
     public void addEvent(Event event){
         eventList.add(event);
     }
 
+    /**
+     * This method runs a complete iteration of the simulation, and at the same time creates and updates at ruuning time
+     * a Simulator Statistics object that holds all the statistics of the iteration, including the one from queries and
+     * the modules.
+     * @return A SimulatorStatistics object, that holds all statistics of the iteration.
+     */
     public SimulatorStatistics runSimulation()  {
         //Initialize system
         initializeDBMS();
@@ -76,6 +100,7 @@ public class Simulator {
         Event firstArrival = new Event(EventType.NEW_QUERY, ProbabilityDistributions.Exponential(35.0/60.0) );
         eventList.add(firstArrival);
         double time = clock;
+        double timeSlice = totalRunningTime / 15;
 
         //Run simulation
         while(clock < totalRunningTime){
@@ -84,7 +109,8 @@ public class Simulator {
             currentEventAsString = currentEvent.toString();
             //Move clock to event time
             clock = currentEvent.getTime();
-            if (clock - time >= delayTime && delayMode) {
+            //Verify if a notification to the interface should be sent
+            if (clock - time >= timeSlice && delayMode) {
                 anInterface.updateSecondFrame(simulatorStatistics);
                 time = clock;
             }
@@ -101,6 +127,9 @@ public class Simulator {
         return simulatorStatistics;
     }
 
+    /**
+     * This method enlarges the constructor, by initializing the remaining attributes of the Simulator.
+     */
     private void initializeDBMS() {
         //Simulator variables
         eventList= new PriorityQueue<>(Event::compareTo);
@@ -128,16 +157,30 @@ public class Simulator {
 
     }
 
+    /**
+     * This method manages the TIME_OUT event, by informing the corresponding module that the query has no time left.
+     * @param query: The object whose time is over.
+     */
     private void processQueryTimeout(Query query) {
         query.getCurrentModule().queryTimeout(query);
         clientAdministrator.freeConnection();
     }
 
+    /**
+     * This method manages the QUERY_RETURN event, it updates statistics with the ones from the query, and removes
+     * the time out event from the corresponding query.
+     * @param query: The object about to leave the system.
+     */
     private void processQueryReturn(Query query) {
         simulatorStatistics.processQueryReturn(query);
         eventList.remove(query.getTimeoutEvent());
     }
 
+    /**
+     * This method manages the MODULE_END event by telling the module that a query is done with its service and by
+     * updating the corresponding statistics.
+     * @param query: The query that is about to leave a module.
+     */
     private void processModuleEnd(Query query) {
         Module currentModule = query.getCurrentModule();
         int moduleNumber = currentModule.getModuleNumber();
@@ -145,6 +188,10 @@ public class Simulator {
         simulatorStatistics.processModuleEnd(query, moduleNumber);
     }
 
+    /**
+     * This method manages the NEW_QUERY event, by creating a query sending it to the Client Administrator and creating
+     * the next NEW_QUERY event, which is added to the queue, as well as the TIME_OUT event of the just created query.
+     */
     private void processNewQuery() {
         Query query = new Query();
         Event queryTimeOut = new Event(EventType.QUERY_TIMEOUT, clock + queryTimeoutTime, query);
@@ -155,14 +202,26 @@ public class Simulator {
         clientAdministrator.processArrival(query);
     }
 
+    /**
+     * Getter method for the current clock value. Modules need to know it to create new events.
+     * @return the current clock value.
+     */
     public double getClock() {
         return clock;
     }
 
+    /**
+     * This method calls the SimulatorStatistics of this and tell it to increase by one the number of discarded
+     * connections.
+     */
     public void incrementDiscartedConnections()  {
         simulatorStatistics.incrementDiscartedConnections();
     }
 
+    /**
+     * Getter method for the event being processed currently.
+     * @return A String representation of the current event.
+     */
     public String getCurrentEvent(){
         return currentEventAsString;
     }
