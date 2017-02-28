@@ -529,6 +529,14 @@ public class Interface {
                 else {
                     simulationEnded = true;
                     hideThirdFrame();
+                    SimulationReports reports = new SimulationReports();
+                    try {
+                        reports.generateReports(globalStatistics);
+                    } catch (Exception e1) {
+                        e1.printStackTrace();
+                        System.exit(1);
+                    }
+                    System.exit(0);
                 }
             }
         });

@@ -54,7 +54,7 @@ public class Query implements Comparable<Query> {
      * @return 1 if this query has higher priority, 0 if it has the same priority, -1 if this query has lower priority.
      */
     public int compareTo(Query query){
-        return getQueryType().compareTo(query.getQueryType());
+        return queryType.compareTo(query.getQueryType());
     }
 
     /**

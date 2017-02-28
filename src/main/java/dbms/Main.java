@@ -17,6 +17,8 @@ public class Main {
             statisticsList = anInterface.getStatisticsList();
             globalStatistics = anInterface.getGlobalStatistics();
         }
+        System.out.println("simulation ended, making reports");
+
 
     }
 }
