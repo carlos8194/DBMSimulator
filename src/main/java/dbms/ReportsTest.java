@@ -13,6 +13,7 @@ public class ReportsTest {
     public static void main(String[]args) throws Exception {
         //System.out.println(System.getProperty("user.dir"));
 
+        /*
         List<SimulatorStatistics> statisticsList = new LinkedList<>();
         Simulator dbms = new Simulator(15000,15,3,2,1,15);
         for (int i = 0; i <18  ; i++) {
@@ -20,6 +21,6 @@ public class ReportsTest {
         }
         SimulatorStatistics globalStatistics = new SimulatorStatistics(15000,15,3,2,1,15,statisticsList);
         SimulationReports reports = new SimulationReports();
-        reports.generateReports(globalStatistics);
+        reports.generateReports(globalStatistics);*/
     }
 }

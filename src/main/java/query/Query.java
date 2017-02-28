@@ -182,7 +182,7 @@ public class Query implements Comparable<Query> {
 
     /**
      * Returns this queryTimeout event so that the DBMS system can remove it from the event list if the query exits
-     * succesfully the system.
+     * successfully the system.
      * @return Event event that would kill the query.
      */
     public Event getTimeoutEvent() {

@@ -6,42 +6,50 @@ import module.ModuleStatistics;
 import query.QueryType;
 
 import javax.swing.*;
+import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import java.util.List;
-/**
- * Created by Rodrigo on 2/7/2017.
- */
+
 public class Interface {
 
-    private JFrame firstFrame;
-    private JFrame secondFrame;
-    private JFrame thirdFrame;
+    private JFrame firstFrame;//A frame that shows some boxes for the user to write information.
+    private JFrame secondFrame;//A frame that shows the development of the simulation in delay mode.
+    private JFrame thirdFrame;//A frame that shows information about an iteration when it is over.
 
-    private int iterations;
-    private boolean delay;
-    private double delayTime;
-    private double maxTime;
-    private int k;
-    private int n;
-    private int p;
-    private int m;
-    private double t;
+    //Simulator parameters
+    private int iterations;//Number of iterations.
+    private boolean delay;//A boolean telling whether the simulation will display in delay mode or not.
+    private double delayTime;//Delay time in seconds.
+    private double maxTime;//Total running time of each iteration.
+    private int k;//Module capacity of Client Administrator module.
+    private int n;//Module capacity of the Query Processor module.
+    private int p;//Module capacity of the Transactional Storage Manager module.
+    private int m;//Module capacity of the Query Executor module.
+    private double t;//Query time out.
 
-    private static int i = 1;
-    private boolean simulationEnded = false;
-    private Simulator simulator;
-    private Map<String, JLabel> labelMap;
-    private Map<String, JLabel> otherMap;
-    private List<SimulatorStatistics> statisticsList;
-    private SimulatorStatistics globalStatistics;
+    private static int i = 1;//Current iteration number.
+    private boolean simulationEnded = false;//A boolean telling if the simulation has ended or not.
+    private Simulator simulator;//Pointer to the Simulator object.
+    private Map<String, JLabel> labelMap;//A map to keep access to the labels in the second frame.
+    private Map<String, JLabel> otherMap;//A map to keep access to the labels in the third frame.
+    private List<SimulatorStatistics> statisticsList;//A pointer to the list of statistics gathered by this interface.
+    private SimulatorStatistics globalStatistics;//A pointer to the global statistics of the simulation.
+    private Timer timer;//A timer to manage the delay time events.
 
+    /**
+     * Interface constructor.
+     */
     public Interface(){
         labelMap = new HashMap<>();
         otherMap = new HashMap<>();
+        statisticsList = new LinkedList<>();
     }
 
+    /**
+     * This method initializes the first frame, adds all the necessary components and displays it for the user.
+     */
     public void startFirstFrame(){
         firstFrame = new JFrame("DBMS Simulator configuration.");
         firstFrame.setLocation(200, 300);
@@ -72,7 +80,7 @@ public class Interface {
         info.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(null, "Version 1.1\nCreated by Carlos Luis Mellado Xatruch.");
+                JOptionPane.showMessageDialog(null, "Version 1.1\nCreated by Carlos Luis Mellado Xatruch.\nRodrigo Acuña Fernandez");
             }
         });
         infoMenu.add(info);
@@ -102,11 +110,13 @@ public class Interface {
                     t = Double.parseDouble(tText.getText());
                     hideFirstFrame();
                     initializeSimulator();
-                    if (delay) startSecondFrame();
-                    statisticsList = new LinkedList<>();
-                    if (delay) showSecondFrame();
                     startThirdFrame();
-                    runSimulation();
+                    if (delay) {
+                        startSecondFrame();
+                        initializeTimer();
+                        runSimulationWithDelay();
+                    }
+                    else runSimulation();
                 } catch (NumberFormatException ex){
                     JOptionPane.showMessageDialog(null, "Please write the numbers properly.");
                 }
@@ -181,37 +191,67 @@ public class Interface {
         this.showFirstFrame();
     }
 
+    /**
+     * Initialize the simulator object and its attributes.
+     */
     private void initializeSimulator(){
-        simulator = new Simulator(maxTime, k, n, p, m, t, this, delay);
+        simulator = new Simulator(maxTime, k, n, p, m, t);
+        simulator.initializeSimulation();
     }
 
+    /**
+     * Initializes the timer object and defines its Action Listener object.
+     */
+    private void initializeTimer(){
+        int time = (int) delayTime*1000;
+        timer = new Timer(time, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                timer.stop();
+                runSimulationWithDelay();
+            }
+        });
+    }
+
+    /**
+     * Shows the first frame.
+     */
     private void showFirstFrame(){
         firstFrame.setVisible(true);
     }
 
+    /**
+     * Shows the second frame.
+     */
     private void showSecondFrame(){
         secondFrame.setVisible(true);
     }
 
+    /**
+     * Initializes the second frame, adds all the necessary components, and adds most of them to the map.
+     */
     private void startSecondFrame()  {
         secondFrame = new JFrame("DBMS Simulator running...");
         secondFrame.setLocation(200, 300);
         secondFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         secondFrame.setLayout(new BorderLayout());
 
+        //Simulation parameters
         JPanel northPanel = new JPanel();
         northPanel.setLayout(new FlowLayout());
         northPanel.add(new JLabel("Iterations: "+iterations+"   total time: "+maxTime+"   k: "+k+"   m: "+m+"   n: "+n+"   p: "+p+"   t: "+t));
 
+        //Simulator variables
         JPanel southPanel = new JPanel();
         southPanel.setLayout(new FlowLayout());
         JLabel clockLabel = new JLabel("  Clock: 0.0  "); labelMap.put("clock", clockLabel);
         JLabel eventLabel = new JLabel("  Current Event:   "); labelMap.put("event", eventLabel);
         JLabel discardedConnectionsLabel = new JLabel("  Discarded Connections: 0  "); labelMap.put("discardedConnections", discardedConnectionsLabel);
-        JLabel iterationNumberLabel = new JLabel("  Iteration:   "); labelMap.put("iterations", iterationNumberLabel);
+        JLabel iterationNumberLabel = new JLabel("  Iteration: " + i + "  ");  labelMap.put("iterations", iterationNumberLabel);
         southPanel.add(clockLabel); southPanel.add(eventLabel); southPanel.add(discardedConnectionsLabel);
         southPanel.add(iterationNumberLabel);
 
+        //A grid with some of the modules current data.
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new GridLayout(2,3,10,20));
 
@@ -267,22 +307,47 @@ public class Interface {
         secondFrame.pack();
     }
 
+    /**
+     * Simulation running algorithm in delay mode, processes one event at a time and updates the second frame.
+     * If the simulation is over then it displays the iteration end statistics which come in the third frame.
+     */
+    private void runSimulationWithDelay(){
+        this.hideThirdFrame();
+        this.showSecondFrame();
+        simulator.processNextEvent();
+        this.updateSecondFrame(simulator.getSimulatorStatistics());
+
+        if (simulator.isSimulationOver()) {
+            SimulatorStatistics statistics = simulator.getSimulatorStatistics();
+            statisticsList.add(statistics);
+            this.updateThirdFrame(statistics, i + "");
+            this.hideSecondFrame();
+            this.showThirdFrame();
+            i++;
+        }
+        else timer.restart();
+    }
+
+    /**
+     * Simulation algorithm when delay mode is off, it runs all events at once, updates the third frame and then shows
+     * iteration end statistics.
+     */
     private void runSimulation(){
         this.hideThirdFrame();
-        if (delay) {
-            if (i != 1) this.cleanFrame();
-            labelMap.get("iterations").setText("  Iteration: "+ (i + 1) + "  ");
-            this.showSecondFrame();
+        while ( !simulator.isSimulationOver() ){
+            simulator.processNextEvent();
         }
-        this.sleep();
-        SimulatorStatistics statistics = simulator.runSimulation();
-        if (delay) this.hideSecondFrame();
+        SimulatorStatistics statistics = simulator.getSimulatorStatistics();
         statisticsList.add(statistics);
         this.updateThirdFrame(statistics, i + "");
         this.showThirdFrame();
         i++;
     }
 
+    /**
+     * Updates the second frame using the current statistics found in the simulator.
+     * @param statistics: The SimulatorStatistics object used to update each label.
+     */
     public void updateSecondFrame(SimulatorStatistics statistics){
         this.hideSecondFrame();
         this.setNewText(labelMap.get("clock"), simulator.getClock()+"");
@@ -300,53 +365,71 @@ public class Interface {
         this.showSecondFrame();
     }
 
+    /**
+     * Updates the text of a given label with part of its text plus a new text given.
+     * @param label: the label to update.
+     * @param newText: the new value to replace an old value in a labels text.
+     */
     private void setNewText(JLabel label, String newText){
         String oldText = label.getText();
         int i = oldText.lastIndexOf(':');
-        label.setText( "   " + oldText.substring(0, i + 1) + " " + newText + "  " );
+        label.setText( oldText.substring(0, i + 1) + " " + newText);
     }
 
-    private void sleep(){
-        if(delay){
-            try {
-                Thread.sleep( (long) 6*1000);
-            }catch (InterruptedException e){
-                System.out.println(e.getMessage());
-                System.exit(1);
-            }
-        }
-    }
-
+    /**
+     * Getter method for the statistics list gathered during the simulation.
+     * @return a list with the statistics.
+     */
     public List<SimulatorStatistics> getStatisticsList(){
         return statisticsList;
     }
 
+    /**
+     * An average of the statistics found inside the list of statistics.
+     * @return Global Statistics.
+     */
     public SimulatorStatistics getGlobalStatistics(){
         return globalStatistics;
     }
 
+    /**
+     * Hides the second frame.
+     */
     private void hideSecondFrame(){
         secondFrame.setVisible(false);
     }
 
+    /**
+     * Shows the third frame.
+     */
     private void showThirdFrame(){
         thirdFrame.setVisible(true);
     }
 
+    /**
+     * Hides the third frame.
+     */
     private void hideThirdFrame(){
         thirdFrame.setVisible(false);
     }
 
+    /**
+     * Hides the first frame.
+     */
     private void hideFirstFrame(){
         firstFrame.setVisible(false);
     }
 
+    /**
+     * Initializes the third frame, adds the necessary components and adds most of them to the map.
+     */
     private void startThirdFrame(){
         thirdFrame = new JFrame("Iteration end");
         thirdFrame.setLocation(200, 300);
         thirdFrame.setLayout(new BorderLayout());
         thirdFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        //Simulation parameters.
         JPanel northPanel = new JPanel();
         northPanel.setLayout(new FlowLayout());
         JLabel averageLifeTimeLabel = new JLabel("Average Query Lifetime: "); otherMap.put("averageLifeTime", averageLifeTimeLabel);
@@ -354,9 +437,9 @@ public class Interface {
         JLabel iterationLabel = new JLabel("Iteration : "); otherMap.put("iterations", iterationLabel);
         northPanel.add(iterationLabel); northPanel.add(averageLifeTimeLabel); northPanel.add(discardedConnectionsLabel);
 
+        //A grid with the statistics of the modules.
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new GridLayout(2,3,10,20));
-
         String averageQueueSize = "  Average Queue Size:   "; String idleTime = "  Idle time:   ";
         String DDLtime = "  DDL Lifetime:   "; String JOINtime = "  JOIN Lifetime:   ";
         String SELECTtime = "  SELECT Lifetime:   "; String UPDATEtime = "  UPDATE Lifetime:   ";
@@ -423,11 +506,19 @@ public class Interface {
 
         centerPanel.add(mod0); centerPanel.add(mod1); centerPanel.add(mod2); centerPanel.add(mod3); centerPanel.add(mod4);
 
+        //Proceed button takes us to the next iteration, the average or the end of simulation.
         JButton button = new JButton("Proceed");
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (i <= iterations) runSimulation();
+                if (i <= iterations) {
+                    simulator.initializeSimulation();
+                    if (delay) {
+                        cleanFrame();
+                        runSimulationWithDelay();
+                    }
+                    else runSimulation();
+                }
                 else if (i == iterations + 1){
                     globalStatistics = new SimulatorStatistics(maxTime, k, n, p, m, t, statisticsList);
                     hideThirdFrame();
@@ -447,6 +538,11 @@ public class Interface {
         thirdFrame.pack();
     }
 
+    /**
+     * Updates the content of the third frame with the given Simulator Statistics and a iteration String object.
+     * @param statistics: Iteration end statistics.
+     * @param iteration: A String including the number of the iteration, or the word average.
+     */
     private void updateThirdFrame(SimulatorStatistics statistics, String iteration){
         //General statistics
         this.setNewText(otherMap.get("averageLifeTime"), statistics.getAverageQueryLifeTime()+"");
@@ -462,7 +558,6 @@ public class Interface {
         this.setNewText(otherMap.get("mod4AverageQueueSize"), averageQueueSizes[4]+"");
 
         //Idle time per module
-        //double[] idleTimes = statistics.getAverageIdleTimes();
         this.setNewText(otherMap.get("mod0IdleTime"), statistics.getModuleIdleTime(0)+"");
         this.setNewText(otherMap.get("mod1IdleTime"), statistics.getModuleIdleTime(1)+"");
         this.setNewText(otherMap.get("mod2IdleTime"), statistics.getModuleIdleTime(2)+"");
@@ -503,12 +598,17 @@ public class Interface {
         thirdFrame.pack();
     }
 
+    /**
+     * This method removes the old values from the previous iteration from the second frame, and replaces them either
+     * with the default ones or an empty space.
+     */
     private void cleanFrame(){
         Set<String> stringSet = labelMap.keySet();
         Iterator it = stringSet.iterator();
         while (it.hasNext()){
             this.setNewText( labelMap.get( it.next() ), "");
         }
+        labelMap.get("iterations").setText("  Iteration: "+ i + "  ");
         secondFrame.pack();
     }
 

@@ -2,7 +2,6 @@ package dbms;
 
 import interfaces.Interface;
 import interfaces.SimulationReports;
-
 import java.util.List;
 
 public class Main {

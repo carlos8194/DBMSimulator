@@ -15,11 +15,8 @@ public class Simulator {
     //Simulator variables
     private double clock;
 
-    //Simulation Statistics
-    private SimulatorStatistics simulatorStatistics;
-
-    //Event List
-    private PriorityQueue<Event> eventList;
+    private SimulatorStatistics simulatorStatistics;//Simulation Statistics
+    private PriorityQueue<Event> eventList;//Event List
 
     //Modules
     private ClientAdministrator clientAdministrator;
@@ -35,14 +32,10 @@ public class Simulator {
     private int simultaneousConsultations;//Module 3: Transactional Storage Manager p
     private int parallelStatements;//Module 4: QueryExecutor m
     private double queryTimeoutTime;//Simulator: t
-    private boolean delayMode;
-    private double delayTime;
-
-    //Interface
-    private Interface anInterface;
 
     //A String representation of the current event, used to notify the interface of what is currently happening.
     private String currentEventAsString;
+    private boolean simulationIsOver;
 
     /**
      * Simulator constructor.
@@ -52,21 +45,7 @@ public class Simulator {
      * @param p: Servers in the Transactional Storage Manager module.
      * @param m: Servers in the Query Executor module.
      * @param t: Time out per query.
-     * @param anInterface: a pointer to the interface directing the application.
-     * @param delayMode: Whether delay mode is active in the interface or not.
      */
-    public Simulator(double time, int k, int n, int p, int m, double t, Interface anInterface, boolean delayMode){
-        //DBMs parameters
-        totalRunningTime = time;
-        concurrentConnections = k;
-        availableProcesses = n;
-        simultaneousConsultations = p;
-        parallelStatements = m;
-        queryTimeoutTime = t;
-        this.anInterface = anInterface;
-        this.delayMode = delayMode;
-    }
-
     public Simulator(double time, int k, int n, int p, int m, double t){
         //DBMs parameters
         totalRunningTime = time;
@@ -75,8 +54,6 @@ public class Simulator {
         simultaneousConsultations = p;
         parallelStatements = m;
         queryTimeoutTime = t;
-        this.delayMode = false;
-
     }
 
     /**
@@ -93,38 +70,12 @@ public class Simulator {
      * the modules.
      * @return A SimulatorStatistics object, that holds all statistics of the iteration.
      */
-    public SimulatorStatistics runSimulation()  {
+    public void initializeSimulation() {
         //Initialize system
         initializeDBMS();
         clock = 0;
         Event firstArrival = new Event(EventType.NEW_QUERY, ProbabilityDistributions.Exponential(35.0/60.0) );
         eventList.add(firstArrival);
-        double time = clock;
-        double timeSlice = totalRunningTime / 15;
-
-        //Run simulation
-        while(clock < totalRunningTime){
-            //Get nextModule event
-            Event currentEvent = eventList.poll();
-            currentEventAsString = currentEvent.toString();
-            //Move clock to event time
-            clock = currentEvent.getTime();
-            //Verify if a notification to the interface should be sent
-            if (clock - time >= timeSlice && delayMode) {
-                anInterface.updateSecondFrame(simulatorStatistics);
-                time = clock;
-            }
-            //Process Event
-            Query query = currentEvent.getQuery();
-            switch(currentEvent.getType()){
-                case NEW_QUERY: processNewQuery();break;
-                case MODULE_END: processModuleEnd(query);break;
-                case QUERY_RETURN: processQueryReturn(query);break;
-                case QUERY_TIMEOUT: processQueryTimeout(query);break;
-            }
-        }
-        simulatorStatistics.calculateFinalStatistics();
-        return simulatorStatistics;
     }
 
     /**
@@ -144,6 +95,7 @@ public class Simulator {
         queryProcessor.setNextModule(transactionalStorageManager);
         transactionalStorageManager.setNextModule(queryExecutor);
         queryExecutor.setNextModule(clientAdministrator);
+        simulationIsOver = false;
 
         //Statistics
         ModuleStatistics[] moduleStatistics = {
@@ -226,7 +178,54 @@ public class Simulator {
         return currentEventAsString;
     }
 
+    /**
+     * This method processes a single event, but if total running time has expired then it calculates final statistics
+     * and sets the corresponding flag.
+     */
+    public void processNextEvent() {
+        if (clock < totalRunningTime) {
+            //Get nextModule event
+            Event currentEvent = eventList.poll();
+            currentEventAsString = currentEvent.toString();
+            //Move clock to event time
+            clock = currentEvent.getTime();
+            //Verify if a notification to the interface should be sent
+            //Process Event
+            Query query = currentEvent.getQuery();
+            switch (currentEvent.getType()) {
+                case NEW_QUERY:
+                    processNewQuery();
+                    break;
+                case MODULE_END:
+                    processModuleEnd(query);
+                    break;
+                case QUERY_RETURN:
+                    processQueryReturn(query);
+                    break;
+                case QUERY_TIMEOUT:
+                    processQueryTimeout(query);
+                    break;
+            }
+        } else {
+            simulatorStatistics.calculateFinalStatistics();
+            simulationIsOver = true;
+        }
+    }
 
+    /**
+     * This method tells whether if the simulation has ended or not, the interface needs to know if this has happened
+     * or not.
+     * @return a boolean, true if running time has expired, false otherwise.
+     */
+    public boolean isSimulationOver() {
+        return simulationIsOver;
+    }
 
-    
+    /**
+     * Getter method for the simulator statistics.
+     * @return SimulatorStatistics object.
+     */
+    public SimulatorStatistics getSimulatorStatistics() {
+        return simulatorStatistics;
+    }
 }

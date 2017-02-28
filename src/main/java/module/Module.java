@@ -168,9 +168,9 @@ public abstract class Module {
         else{
             query.setCurrentlyInQueue(false);
             //Wq: TotalQueueTime change.
-            double queuetime = time -  queryStatistics.getQueueEntryTime();
-            queryStatistics.setModuleQueueTime(moduleNumber, queuetime);
-            statistics.incrementTotalQueueTime(queuetime);
+            double queueTime = time -  queryStatistics.getQueueEntryTime();
+            queryStatistics.setModuleQueueTime(moduleNumber, queueTime);
+            statistics.incrementTotalQueueTime(queueTime);
         }
     }
 
