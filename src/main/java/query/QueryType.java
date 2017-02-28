@@ -1,7 +1,9 @@
 package query;
 
 /**
- * Created by Carlos on 03/02/2017.
+ * This class implements an enumerable class to distinguish between query types.
+ * Queries may be require only read operations or both read and write operations, this
+ * class differentiates them by a boolean readOnly field.
  */
 public enum QueryType {
     DDL(true),
@@ -11,6 +13,10 @@ public enum QueryType {
 
     public boolean readOnly;
 
+    /**
+     * Constructor for the Query Type class, creates class and set readOnly to true for DDL and Join queryTypes.
+     * @param readOnly
+     */
     QueryType(boolean readOnly){
         this.readOnly = readOnly;
     }

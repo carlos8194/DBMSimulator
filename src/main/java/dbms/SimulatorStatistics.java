@@ -113,6 +113,55 @@ public class SimulatorStatistics {
     }
 
 
+    //Running Statistics Methods.
+    /**
+     * Running time statistic increments the number of discarted connections by one
+     */
+    public void incrementDiscartedConnections(){discartedConnections++;}
+
+    /**
+     * Running time statistic, processes a query return by adding its lifetime to the average and increasing the amount
+     * of queries processed by the system
+     */
+    public void processQueryReturn(Query query) {
+        averageQueryLifeTime += query.getStatistics().getQueryLifeTime();
+        totalQueriesProcessed++;
+    }
+
+    /**
+     * Running time statistic, processes a query module end by adding the time spent at this module to the average and
+     * increasing the amount of queries processed of its specific QueryType.
+     * of queries processed by the system
+     */
+    public void processModuleEnd(Query query, int moduleNumber) {
+        QueryType queryType = query.getQueryType();
+        switch (queryType){
+            case DDL:
+                averageDDLTimes[moduleNumber] += query.getStatistics().getModuleTime(moduleNumber);
+                numberOfDDls++;
+                break;
+            case JOIN:
+                averageJoinTimes[moduleNumber] += query.getStatistics().getModuleTime(moduleNumber);
+                numberOfJoins++;
+                break;
+            case SELECT:
+                averageSelectTimes[moduleNumber] += query.getStatistics().getModuleTime(moduleNumber);
+                numberOfSelects++;
+                break;
+            case UPDATE:
+                averageUpdateTimes[moduleNumber] += query.getStatistics().getModuleTime(moduleNumber);
+                numberOfUpdates++;
+                break;
+        }
+    }
+
+
+    //Final Statistics for report.
+    /**
+     * When used as an individual iteration statistics class, this methods does some final calculation on each varaiable
+     * so that the final statistic is ready to be presented by the get methods. It also calls the calculateFinalStatistic
+     * method of each module, so that every moduleStatistic is ready to be presented as well.
+     */
     public void calculateFinalStatistics(){
         for (int i = 0; i <5 ; i++) {
             ModuleStatistics statistics = moduleStatistics[i];
@@ -128,6 +177,90 @@ public class SimulatorStatistics {
 
     }
 
+    //3.Average Queue Size.
+    /**
+     * When used as an individual iteration statistics class, returns the averageSize of the queue of the module specified
+     * by the moduleNumber parameter, in this iteration
+     * @param moduleNumber
+     * @return module's average queueSize.
+     */
+    public double getAverageQueueSize(int moduleNumber){
+        return queueSizes[moduleNumber];
+    }
+
+    //4.Average Query Lifetime
+
+    /**
+     * When used as an individual iteration statistics class, returns the average lifetime of a query. Does not take
+     * into account queries killed by timeouts.
+     * When used as a global statistics class, returns the same as an average of all iterations.
+     * @return averageQueryLifeTime.
+     */
+    public double getAverageQueryLifeTime(){
+        return averageQueryLifeTime;
+    }
+
+    //5.Number of discarted connections.
+    /**
+     * When used as an individual iteration statistics class, returns the number of connections discarted by the system
+     * due to full capacity this iteration.
+     * @return discartedConnections
+     */
+    public int getNumberOfDiscartedConnections(){
+        return discartedConnections;
+    }
+
+    //6. Average time spent on each module by queryType
+    /**
+     * When used as an individual iteration statistics class, returns the average amount of time an specific QueryType
+     * spent in each module as an array.
+     * When used as a global statistics class, returns the same as an average of all iterations.
+     * @param queryType
+     * @return average time spent in each module by a QueryType as an array.
+     */
+    public double[] getAverageTimesByQueryType(QueryType queryType){
+        switch (queryType){
+            case DDL:
+                return averageDDLTimes;
+            case JOIN:
+                return averageJoinTimes;
+            case SELECT:
+                return averageSelectTimes;
+            case UPDATE:
+                return averageUpdateTimes;
+        }
+        return null;
+    }
+
+    //7.Idle time by Module. Contained in ModuleStatistics.
+    /**
+     * When used as an individual iteration statistics class, returns the amount of time the module specified by the
+     * moduleNumber parameter was idle
+     * @param moduleNumber
+     * @return idleTime
+     */
+    public double getModuleIdleTime(int moduleNumber){
+        return idleTimes[moduleNumber];
+    }
+
+    //8.Module Statistics.
+    /**
+     * When used as an individual iteration statistics class, returns the module's statistic specified by the
+     * moduleNumber parameter
+     * @param moduleNumber
+     * @return ModuleStatistics
+     */
+    public ModuleStatistics getModuleStatistics(int moduleNumber){
+        return moduleStatistics[moduleNumber];
+    }
+
+
+    //GlobalStatistics methods. Methods used when object is used for averaging all iterations statistics.
+    /**
+     * When the class is used as a global statistics class, this method calculates the average of all the statistics
+     * contained in the statisticsList class field.
+     * It does so by adding each statistic to create a total, and then dividing each variable by the number of iterations.
+     */
     public void calculateGlobalStatistics(){
         numberOfIterations = statisticsList.size();
 
@@ -162,77 +295,6 @@ public class SimulatorStatistics {
             averageDDLTimes[i] /= numberOfIterations;
         }
     }
-
-
-    //Running Statistics Methods.
-    public void incrementDiscartedConnections(){discartedConnections++;}
-
-    public void processQueryReturn(Query query) {
-        averageQueryLifeTime += query.getStatistics().getQueryLifeTime();
-        totalQueriesProcessed++;
-    }
-    public void processModuleEnd(Query query, int moduleNumber) {
-        QueryType queryType = query.getQueryType();
-        switch (queryType){
-            case DDL:
-                averageDDLTimes[moduleNumber] += query.getStatistics().getModuleTime(moduleNumber);
-                numberOfDDls++;
-                break;
-            case JOIN:
-                averageJoinTimes[moduleNumber] += query.getStatistics().getModuleTime(moduleNumber);
-                numberOfJoins++;
-                break;
-            case SELECT:
-                averageSelectTimes[moduleNumber] += query.getStatistics().getModuleTime(moduleNumber);
-                numberOfSelects++;
-                break;
-            case UPDATE:
-                averageUpdateTimes[moduleNumber] += query.getStatistics().getModuleTime(moduleNumber);
-                numberOfUpdates++;
-                break;
-        }
-    }
-
-
-    //Final Statistics for report.
-    //3.Average Queue Size.
-    public double getAverageQueueSize(int moduleNumber){
-        return queueSizes[moduleNumber];
-    }
-    //4.Average Query Lifetime
-    public double getAverageQueryLifeTime(){
-        return averageQueryLifeTime;
-    }
-    //5.Number of discarted connections.
-    public int getNumberOfDiscartedConnections(){
-        return discartedConnections;
-    }
-    //6. Average time spent on each module by queryType
-    public double[] getAverageTimesByQueryType(QueryType queryType){
-        switch (queryType){
-            case DDL:
-                return averageDDLTimes;
-            case JOIN:
-                return averageJoinTimes;
-            case SELECT:
-                return averageSelectTimes;
-            case UPDATE:
-                return averageUpdateTimes;
-        }
-        return null;
-    }
-    //7.Idle time by Module. Contained in ModuleStatistics.
-    public double getModuleIdleTime(int moduleNumber){
-        return idleTimes[moduleNumber];
-    }
-
-    //8.Module Statistics.
-    public ModuleStatistics getModuleStatistics(int moduleNumber){
-        return moduleStatistics[moduleNumber];
-    }
-
-
-    //GlobalStatistics methods. Methods used when object is used for averaging all iterations statistics.
 
     /**
      * When used as a global statistics class, returns the average queueSizes of each module as an array.

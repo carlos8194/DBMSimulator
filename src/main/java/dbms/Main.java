@@ -4,9 +4,7 @@ import interfaces.Interface;
 import interfaces.SimulationReports;
 
 import java.util.List;
-/**
- * Created by Carlos on 18/02/2017.
- */
+
 public class Main {
 
     public static void main(String[] args) throws Exception {
