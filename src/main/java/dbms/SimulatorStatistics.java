@@ -1,6 +1,5 @@
 package dbms;
 
-import module.Module;
 import module.ModuleStatistics;
 import query.*;
 
@@ -23,6 +22,7 @@ public class SimulatorStatistics {
     private int numberOfJoins;
     private int numberOfDDls;
     private int totalQueriesProcessed;
+    private double averageQueriesProcessed;
 
     //1.Simulator Parameters.
     private double time;
@@ -40,6 +40,7 @@ public class SimulatorStatistics {
 
     //5.Number of discarted Connections.
     private int discartedConnections;
+    private double averageDiscartedConnections;
 
     //6.Average time spent on each Module by QueryType.
     private double[] averageSelectTimes;
@@ -126,7 +127,7 @@ public class SimulatorStatistics {
      */
     public void processQueryReturn(Query query) {
         averageQueryLifeTime += query.getStatistics().getQueryLifeTime();
-        totalQueriesProcessed++;
+        totalQueriesProcessed = getTotalQueriesProcessed() + 1;
     }
 
     /**
@@ -172,7 +173,7 @@ public class SimulatorStatistics {
             queueSizes[i] = statistics.getAverageQueueSize();
             idleTimes[i] = statistics.getIdleTime();
         }
-        averageQueryLifeTime = averageQueryLifeTime/totalQueriesProcessed;
+        averageQueryLifeTime = averageQueryLifeTime/ getTotalQueriesProcessed();
         for(double time: averageSelectTimes){time = time/numberOfSelects;}
         for(double time: averageDDLTimes){time = time/numberOfDDls;}
         for(double time: averageJoinTimes){time = time/numberOfJoins;}
@@ -257,6 +258,16 @@ public class SimulatorStatistics {
         return moduleStatistics[moduleNumber];
     }
 
+    /**
+     * When used as an individual iteration statistics class, returns the total amount of queries that successfully
+     * exited the system during this iteration.
+     * @return totalQueriesProcessed
+     */
+    public int getTotalQueriesProcessed() {
+        return totalQueriesProcessed;
+    }
+
+
 
     //GlobalStatistics methods. Methods used when object is used for averaging all iterations statistics.
     /**
@@ -271,6 +282,7 @@ public class SimulatorStatistics {
         for (SimulatorStatistics statistic: statisticsList) {
             averageQueryLifeTime = averageQueryLifeTime + statistic.getAverageQueryLifeTime();
             discartedConnections = discartedConnections + statistic.getNumberOfDiscartedConnections();
+            totalQueriesProcessed = totalQueriesProcessed + statistic.getTotalQueriesProcessed();
             double [] select = statistic.getAverageTimesByQueryType(QueryType.SELECT);
             double [] update = statistic.getAverageTimesByQueryType(QueryType.UPDATE);
             double [] join = statistic.getAverageTimesByQueryType(QueryType.JOIN);
@@ -288,7 +300,8 @@ public class SimulatorStatistics {
 
         //Divide by number of iterations.
         averageQueryLifeTime /= numberOfIterations;
-        discartedConnections /= numberOfIterations;
+        averageDiscartedConnections = discartedConnections / numberOfIterations;
+        averageQueriesProcessed = totalQueriesProcessed / numberOfIterations;
         for (int i = 0; i <5 ; i++) {
             queueSizes[i] /= numberOfIterations;
             idleTimes[i] /= numberOfIterations;
@@ -323,6 +336,16 @@ public class SimulatorStatistics {
     public double[] getAverageIdleTimes() {
         return idleTimes;
     }
+
+    /**
+     * When used as a global statistics class, returns the average amount of queries that successfully
+     * exited the system.
+     * @return totalQueriesProcessed
+     */
+    public double getAverageQueriesProcessed() {
+        return averageQueriesProcessed;
+    }
+
 
 
     /**
@@ -389,7 +412,6 @@ public class SimulatorStatistics {
      * @return t
      */
     public double getT() {return t;}
-
 
 
 
