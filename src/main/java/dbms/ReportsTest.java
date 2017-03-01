@@ -11,7 +11,7 @@ public class ReportsTest {
         List<SimulatorStatistics> statisticsList = new LinkedList<>();
         for (int i = 0; i < iterations; i++){
             simulator.initializeSimulation();
-            while (simulator.isSimulationOver()){
+            while (!simulator.isSimulationOver()){
                 simulator.processNextEvent();
             }
             statisticsList.add(simulator.getSimulatorStatistics());
