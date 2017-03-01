@@ -1,29 +1,29 @@
 package dbms;
 
-import interfaces.Interface;
+import java.util.*;
 import interfaces.SimulationReports;
-import query.Query;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.PriorityQueue;
-
-/**
- * Created by Rodrigo on 2/25/2017.
- */
 public class ReportsTest {
-    public static void main(String[]args) throws Exception {
-        //System.out.println(System.getProperty("user.dir"));
-        PriorityQueue<Query> cola = new PriorityQueue<>(Query::compareTo);
-        for (int i = 0; i <100; i++) {
-            cola.add(new Query());
+
+    public static void main(String[] args) {
+        int iterations = 10;
+        Simulator simulator = new Simulator(1500, 15, 3, 2, 1, 450);
+        List<SimulatorStatistics> statisticsList = new LinkedList<>();
+        for (int i = 0; i < iterations; i++){
+            simulator.initializeSimulation();
+            while (simulator.isSimulationOver()){
+                simulator.processNextEvent();
+            }
+            statisticsList.add(simulator.getSimulatorStatistics());
         }
-
-        for (int i = 0; i <100 ; i++) {
-            System.out.println(cola.poll().getQueryType());
+        SimulatorStatistics globalStatistics = new SimulatorStatistics(1500, 15, 3, 2, 1, 450, statisticsList);
+        SimulationReports reports = new SimulationReports();
+        try {
+            reports.generateReports(globalStatistics);
+        } catch (Exception e1) {
+            e1.printStackTrace();
+            System.exit(1);
         }
-
-
     }
+
 }
