@@ -1,7 +1,7 @@
-<html>
-<head>
+<HTML>
+<HEAD>
     <meta charset="UTF-8">
-    <title>Index</title>
+    <TITLE>Index</TITLE>
     <style>
     table, th, td {
     border: 1px solid black;
@@ -12,7 +12,7 @@
     text-align: center;
     }
     </style>
-</head>
+</HEAD>
 
 <body>
     <header><h1>Index</h1></header>
@@ -60,12 +60,12 @@
 
         <th>Module</th>
         <th>Average Queue Size</th>
-        <th>Average Idle Time</th>
+        <th>Idle Time</th>
         <th colspan="2">Time By Query Type</th>
 
         #foreach( $i in [0..4] )
             <tr>
-                <th rowspan="5">$modules[$i]</th>
+                <td rowspan="5">$modules[$i]</td>
                 <td rowspan="5">$queueSizes[$i]</td>
                 <td rowspan="5">$idleTimes[$i]</td>
 
@@ -87,7 +87,7 @@
     <p>If you want to see the statistics report of an specific iteration run, click the link below.</p>
     #set($html = ".html")
         #foreach($it in [1..$iterations])
-            <p><a href="./iterations/iteration_$it$html">Iteration$it</a></p>
+            <p><a href="/DBMSimulator/src/statistics//iterations/iteration_$it$html">Iteration$it</a></p>
         #end
 
 
@@ -96,4 +96,4 @@
 
 
 
-</html>
+</HTML>

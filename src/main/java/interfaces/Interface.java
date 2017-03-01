@@ -102,7 +102,7 @@ public class Interface {
                 try{
                     iterations = Integer.parseInt(iterationsText.getText());
                     maxTime = Double.parseDouble(maxTimeText.getText());
-                    delayTime = Double.parseDouble(delayTimeText.getText());
+                    delayTime = (delay) ? Double.parseDouble(delayTimeText.getText()) : 0;
                     k = Integer.parseInt(kText.getText());
                     n = Integer.parseInt(nText.getText());
                     p = Integer.parseInt(pText.getText());
@@ -620,6 +620,9 @@ public class Interface {
         secondFrame.pack();
     }
 
+    /**
+     * @return true if this Interface has ended showing the results of the simulation, false otherwise.
+     */
     public boolean simulationHasEnded(){
         return simulationEnded;
     }
