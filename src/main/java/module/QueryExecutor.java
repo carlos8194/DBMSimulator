@@ -42,7 +42,7 @@ public class QueryExecutor extends Module {
                 duration = 1;
                 break;
             default:
-                duration = Math.pow(query.getBlocks(), 2);
+                duration = Math.pow(query.getBlocks(), 2)/1000;
                 break;
         }
         return duration;
