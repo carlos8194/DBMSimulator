@@ -29,8 +29,8 @@ public class Interface {
     private int m;//Module capacity of the Query Executor module.
     private double t;//Query time out.
 
-    private static int i = 1;//Current iteration number.
-    private boolean simulationEnded = false;//A boolean telling if the simulation has ended or not.
+    private static int iterationNumber;//Current iteration number.
+    private boolean simulationEnded;//A boolean telling if the simulation has ended or not.
     private Simulator simulator;//Pointer to the Simulator object.
     private Map<String, JLabel> labelMap;//A map to keep access to the labels in the second frame.
     private Map<String, JLabel> otherMap;//A map to keep access to the labels in the third frame.
@@ -45,6 +45,8 @@ public class Interface {
         labelMap = new HashMap<>();
         otherMap = new HashMap<>();
         statisticsList = new LinkedList<>();
+        iterationNumber = 1;
+        simulationEnded = false;
     }
 
     /**
@@ -247,7 +249,7 @@ public class Interface {
         JLabel clockLabel = new JLabel("  Clock: 0.0  "); labelMap.put("clock", clockLabel);
         JLabel eventLabel = new JLabel("  Current Event:   "); labelMap.put("event", eventLabel);
         JLabel discardedConnectionsLabel = new JLabel("  Discarded Connections: 0  "); labelMap.put("discardedConnections", discardedConnectionsLabel);
-        JLabel iterationNumberLabel = new JLabel("  Iteration: " + i + "  ");  labelMap.put("iterations", iterationNumberLabel);
+        JLabel iterationNumberLabel = new JLabel("  Iteration: " + iterationNumber + "  ");  labelMap.put("iterations", iterationNumberLabel);
         southPanel.add(clockLabel); southPanel.add(eventLabel); southPanel.add(discardedConnectionsLabel);
         southPanel.add(iterationNumberLabel);
 
@@ -320,10 +322,10 @@ public class Interface {
         if (simulator.isSimulationOver()) {
             SimulatorStatistics statistics = simulator.getSimulatorStatistics();
             statisticsList.add(statistics);
-            this.updateThirdFrame(statistics, i + "");
+            this.updateThirdFrame(statistics, iterationNumber + "");
             this.hideSecondFrame();
             this.showThirdFrame();
-            i++;
+            iterationNumber++;
         }
         else timer.restart();
     }
@@ -339,9 +341,9 @@ public class Interface {
         }
         SimulatorStatistics statistics = simulator.getSimulatorStatistics();
         statisticsList.add(statistics);
-        this.updateThirdFrame(statistics, i + "");
+        this.updateThirdFrame(statistics, iterationNumber + "");
         this.showThirdFrame();
-        i++;
+        iterationNumber++;
     }
 
     /**
@@ -511,7 +513,7 @@ public class Interface {
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (i <= iterations) {
+                if (iterationNumber <= iterations) {
                     simulator.initializeSimulation();
                     if (delay) {
                         cleanFrame();
@@ -519,12 +521,12 @@ public class Interface {
                     }
                     else runSimulation();
                 }
-                else if (i == iterations + 1){
+                else if (iterationNumber == iterations + 1){
                     globalStatistics = new SimulatorStatistics(maxTime, k, n, p, m, t, statisticsList);
                     hideThirdFrame();
                     updateThirdFrame(globalStatistics, "average");
                     showThirdFrame();
-                    ++i;
+                    ++iterationNumber;
                 }
                 else {
                     simulationEnded = true;
@@ -616,7 +618,7 @@ public class Interface {
         while (it.hasNext()){
             this.setNewText( labelMap.get( it.next() ), "");
         }
-        labelMap.get("iterations").setText("  Iteration: "+ i + "  ");
+        labelMap.get("iterations").setText("  Iteration: "+ iterationNumber + "  ");
         secondFrame.pack();
     }
 
