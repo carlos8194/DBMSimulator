@@ -7,7 +7,13 @@ public class ReportsTest {
 
     public static void main(String[] args) {
         int iterations = 10;
-        Simulator simulator = new Simulator(1500, 15, 3, 2, 1, 450);
+        double totalRunningTime = 15000;
+        int k = 15;
+        int n = 3;
+        int p = 2;
+        int m = 1;
+        int t = 15;
+        Simulator simulator = new Simulator(totalRunningTime, k, n, p, m, t);
         List<SimulatorStatistics> statisticsList = new LinkedList<>();
         for (int i = 0; i < iterations; i++){
             simulator.initializeSimulation();
@@ -16,7 +22,7 @@ public class ReportsTest {
             }
             statisticsList.add(simulator.getSimulatorStatistics());
         }
-        SimulatorStatistics globalStatistics = new SimulatorStatistics(1500, 15, 3, 2, 1, 450, statisticsList);
+        SimulatorStatistics globalStatistics = new SimulatorStatistics(totalRunningTime, k, n, p, m, t, statisticsList);
         SimulationReports reports = new SimulationReports();
         try {
             reports.generateReports(globalStatistics);
