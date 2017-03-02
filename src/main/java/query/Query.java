@@ -40,8 +40,7 @@ public class Query implements Comparable<Query> {
 
         }
         timeOut = false;
-        queryID = queryNumber;
-        queryNumber++;
+        queryID = queryNumber++;
         statistics = new QueryStatistics(this);
         currentlyInQueue = false;
     }
@@ -82,7 +81,7 @@ public class Query implements Comparable<Query> {
     }
 
     /**
-     * Returns the statistics asocciated to this query. Containing entry and exit times to each module and the DBMS.
+     * Returns the statistics associated to this query. Containing entry and exit times to each module and the DBMS.
      * @return statistics.
      */
     public QueryStatistics getStatistics(){
@@ -136,7 +135,7 @@ public class Query implements Comparable<Query> {
      * @return true if the object received as parameter is the same as this object.
      */
     public boolean equals(Object o){
-        return queryID == o.hashCode();
+        return queryID == o.hashCode() && o instanceof Query;
     }
 
     /**
