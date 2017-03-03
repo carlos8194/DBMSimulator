@@ -3,7 +3,7 @@ package dbms;
 import java.util.*;
 import interfaces.SimulationReports;
 
-public class ReportsTest {
+public class Analisis {
 
     public static void main(String[] args) {
         int iterations = 15;

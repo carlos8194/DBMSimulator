@@ -299,16 +299,16 @@ public class SimulatorStatistics {
         }
 
         //Divide by number of iterations.
-        averageQueryLifeTime /= numberOfIterations;
-        averageDiscartedConnections = discartedConnections / numberOfIterations;
-        averageQueriesProcessed = totalQueriesProcessed / numberOfIterations;
+        averageQueryLifeTime /= (double)numberOfIterations;
+        averageDiscartedConnections = discartedConnections /(double) numberOfIterations;
+        averageQueriesProcessed = totalQueriesProcessed /(double) numberOfIterations;
         for (int i = 0; i <5 ; i++) {
-            queueSizes[i] /= numberOfIterations;
-            idleTimes[i] /= numberOfIterations;
-            averageSelectTimes[i] /= numberOfIterations;
-            averageUpdateTimes[i] /= numberOfIterations;
-            averageJoinTimes[i] /= numberOfIterations;
-            averageDDLTimes[i] /= numberOfIterations;
+            queueSizes[i] /= (double)numberOfIterations;
+            idleTimes[i] /=(double) numberOfIterations;
+            averageSelectTimes[i] /=(double) numberOfIterations;
+            averageUpdateTimes[i] /=(double) numberOfIterations;
+            averageJoinTimes[i] /=(double) numberOfIterations;
+            averageDDLTimes[i] /=(double) numberOfIterations;
         }
     }
 
@@ -326,7 +326,7 @@ public class SimulatorStatistics {
      * @return average discartedConnections.
      */
     public double getAverageDiscartedConnections() {
-        return discartedConnections;
+        return averageDiscartedConnections;
     }
 
     /**

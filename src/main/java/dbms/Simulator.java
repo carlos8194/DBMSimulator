@@ -147,7 +147,7 @@ public class Simulator {
      * the next NEW_QUERY event, which is added to the queue, as well as the TIME_OUT event of the just created query.
      */
     private void processNewQuery() {
-        if(clientAdministrator.getOccupiedServers()==concurrentConnections) this.incrementDiscardedConnections();
+        if(clientAdministrator.getOccupiedServers()==concurrentConnections) this.incrementDiscartedConnections();
         else {
             Query query = new Query();
             Event queryTimeOut = new Event(EventType.QUERY_TIMEOUT, clock + queryTimeoutTime, query);

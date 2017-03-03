@@ -34,7 +34,6 @@ public abstract class Module {
 
         //Attend if posible.
         if (this.attendImmediately(query)) this.attendQuery(query);
-        //else if(moduleNumber == 0) DBMS.incrementDiscardedConnections();
         else {
             //Lq: QueueSize change due to entry.
             this.recordQueueChange(query, ChangeType.ENTRY);

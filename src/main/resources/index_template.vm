@@ -40,7 +40,7 @@
 
     <h3>Average Query Lifetime</h3>
     $statistics.getAverageQueryLifeTime() s
-    <h3>Average Discarted Connections</h3>
+    <h3>Average Discarded Connections</h3>
     $statistics.getAverageDiscartedConnections()
     <h3>Average Processed Queries</h3>
         $statistics.getAverageQueriesProcessed()

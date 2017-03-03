@@ -39,9 +39,12 @@ public class ClientAdministrator extends Module {
         query.getStatistics().setSystemExitTime(time);
         statistics.incrementQueriesProcessed();
 
-        //Create Query Return event
-        Event event = new Event(EventType.QUERY_RETURN, time, query);
-        DBMS.addEvent(event);
+        //Create timeout event or kill query
+        if(time < query.getTimeoutEvent().getTime()) {
+            //Create Query Return event
+            Event event = new Event(EventType.QUERY_RETURN, time, query);
+            DBMS.addEvent(event);
+        }
     }
 
     /**
