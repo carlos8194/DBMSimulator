@@ -135,11 +135,10 @@ public abstract class Module {
      * @param query: The Query whose time is over.
      */
     public  void queryTimeout(Query query){
-        if (query.isCurrentlyInQueue() ){
+        if (query.isCurrentlyInQueue()) {
             queue.remove(query);
             this.recordQueueChange(query, ChangeType.EXIT);
-        }
-        else {
+        } else {
             query.setTimeOut(true);
         }
     }

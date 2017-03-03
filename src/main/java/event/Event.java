@@ -87,7 +87,7 @@ public class Event implements Comparable<Event> {
         }
         else {
             Event event = (Event) obj;
-            comparison = type.equals(event.type) && time == event.time;
+            comparison = type.equals(event.type) && time == event.time && query.equals(event.query);
         }
         return comparison;
     }

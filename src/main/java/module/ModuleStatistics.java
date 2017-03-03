@@ -200,7 +200,7 @@ public class ModuleStatistics {
         arrivalRate = numberOfArrivals / simulationRunningTime;
         //Final service rate.
         serviceRate = queriesProcessed / simulationRunningTime;
-        //Final ocupation rate.
+        //Final occupation rate.
         occupationRate = arrivalRate / serviceRate;
         //Final stability.
         stability = occupationRate < 1 ;
