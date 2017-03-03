@@ -47,4 +47,5 @@ public class QueryExecutor extends Module {
         }
         return duration;
     }
+
 }

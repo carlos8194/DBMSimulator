@@ -19,6 +19,7 @@ public abstract class Module {
     protected Queue<Query> queue; //A queue that keeps queries that can not be attended right away
     protected enum ChangeType {ENTRY,EXIT}; //A enum to identify if a query comes from or out of the queue
 
+    private boolean bugFound = false;
     /**
      * This method does basic things such as attending a client, setting statistics, add queries to the queue...
      * @param query the one entering the module
@@ -66,7 +67,7 @@ public abstract class Module {
         switch(moduleNumber){
             case 3: availableServers = (query.getQueryType() == QueryType.DDL) ? 0 : availableServers--;
                     break;
-            default: availableServers--;
+            default: availableServers--; break;
         }
 
     }
@@ -87,7 +88,7 @@ public abstract class Module {
             case 0: break;
             case 3: availableServers = (query.getQueryType() == QueryType.DDL) ? moduleCapacity : availableServers++;
                 break;
-            default: availableServers++;
+            default: availableServers++; break;
         }
 
         //Attend someone from queue.
@@ -184,6 +185,11 @@ public abstract class Module {
         double timeChange = time - statistics.getServiceSizeChangeTime();
         double accumulatedServiceSize = statistics.getAccumulatedServiceSize();
         int currentServiceSize = moduleCapacity - availableServers;
+
+        if (moduleCapacity < availableServers && !bugFound){
+            bugFound = true;
+            System.out.println("Bug found at time: "+ time+" at module: "+moduleNumber);
+        }
         statistics.setAccumulatedServiceSize(accumulatedServiceSize + (timeChange*currentServiceSize));
         statistics.setServiceSizeChangeTime(time);
 

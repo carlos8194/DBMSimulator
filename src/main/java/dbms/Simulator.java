@@ -125,9 +125,11 @@ public class Simulator {
      * @param query: The object about to leave the system.
      */
     private void processQueryReturn(Query query) {
-        simulatorStatistics.processQueryReturn(query);
-        clientAdministrator.freeConnection();
-        query.setOutOfSystem(true);
+        if (!query.isOutOfSystem()) {
+            simulatorStatistics.processQueryReturn(query);
+            clientAdministrator.freeConnection();
+            query.setOutOfSystem(true);
+        }
     }
 
     /**
