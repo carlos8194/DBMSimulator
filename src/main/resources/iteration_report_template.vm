@@ -40,10 +40,8 @@
 
 <h3>Average Query Lifetime</h3>
     $statistics.getAverageQueryLifeTime() s
-<h3>Discarded Connections</h3>
+<h3>Discarted Connections</h3>
     $statistics.getNumberOfDiscartedConnections()
-<h3>Processed Queries</h3>
-    $statistics.getTotalQueriesProcessed()
 
 <h3>Statistics By Module</h3>
 
@@ -65,7 +63,7 @@
 
     #foreach( $i in [0..4] )
         <tr>
-            <th rowspan="5">$modules[$i]</th>
+            <td rowspan="5">$modules[$i]</td>
             <td rowspan="5">$statistics.getAverageQueueSize($i)</td>
             <td rowspan="5">$statistics.getModuleIdleTime($i)</td>
 
