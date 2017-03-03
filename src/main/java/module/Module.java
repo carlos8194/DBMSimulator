@@ -64,7 +64,6 @@ public abstract class Module {
         DBMS.addEvent(event);
         //Occupy Servers
         switch(moduleNumber){
-            //case 0: break;//??
             case 3: availableServers = (query.getQueryType() == QueryType.DDL) ? 0 : availableServers--;
                     break;
             default: availableServers--;
@@ -136,11 +135,10 @@ public abstract class Module {
      * @param query: The Query whose time is over.
      */
     public  void queryTimeout(Query query){
-        if (query.isCurrentlyInQueue() ){
+        if (query.isCurrentlyInQueue()) {
             queue.remove(query);
             this.recordQueueChange(query, ChangeType.EXIT);
-        }
-        else {
+        } else {
             query.setTimeOut(true);
         }
     }

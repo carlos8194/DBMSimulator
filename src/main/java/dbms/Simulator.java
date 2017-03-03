@@ -113,8 +113,10 @@ public class Simulator {
      * @param query: The object whose time is over.
      */
     private void processQueryTimeout(Query query) {
-        query.getCurrentModule().queryTimeout(query);
-        clientAdministrator.freeConnection();
+        if (!query.isOutOfSystem()) {
+            query.getCurrentModule().queryTimeout(query);
+            clientAdministrator.freeConnection();
+        }
     }
 
     /**
@@ -125,7 +127,7 @@ public class Simulator {
     private void processQueryReturn(Query query) {
         simulatorStatistics.processQueryReturn(query);
         clientAdministrator.freeConnection();
-        eventList.remove(query.getTimeoutEvent());
+        query.setOutOfSystem(true);
     }
 
     /**

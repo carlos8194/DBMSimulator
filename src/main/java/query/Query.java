@@ -19,6 +19,7 @@ public class Query implements Comparable<Query> {
     private boolean timeOut;
     private int blocks;
     private Event timeoutEvent;
+    private boolean outOfSystem;
 
     /**
      * The constructor method for Query creates a query and gives it a QueryType with the appropiate probabilities for
@@ -43,6 +44,7 @@ public class Query implements Comparable<Query> {
         queryID = queryNumber++;
         statistics = new QueryStatistics(this);
         currentlyInQueue = false;
+        outOfSystem = false;
     }
 
 
@@ -186,5 +188,20 @@ public class Query implements Comparable<Query> {
      */
     public Event getTimeoutEvent() {
         return timeoutEvent;
+    }
+
+    /**
+     * @return true if the query has successfully abandoned the system, false otherwise.
+     */
+    public boolean isOutOfSystem(){
+        return outOfSystem;
+    }
+
+    /**
+     * Sets outOfSystem to the boolean sent as parameter.
+     * @param aBoolean: true if the query has left the system, false otherwise.
+     */
+    public void setOutOfSystem(boolean aBoolean){
+        outOfSystem = aBoolean;
     }
 }
