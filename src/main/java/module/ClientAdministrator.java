@@ -42,7 +42,7 @@ public class ClientAdministrator extends Module {
         //Create Query Return event
         Event event = new Event(EventType.QUERY_RETURN, time, query);
         DBMS.addEvent(event);
-        availableServers++;
+
     }
 
     /**

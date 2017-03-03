@@ -86,7 +86,7 @@ public class SimulationReports {
      */
     private void generateIndividualReports(SimulatorStatistics globalStatistics, VelocityEngine velocityEngine) throws IOException {
         List<SimulatorStatistics> statisticsList = globalStatistics.getStatisticsList();
-        Template indexTemplate = velocityEngine.getTemplate( "./src/main/resources/iteration_report_template.vm" );
+        Template iterationTemplate = velocityEngine.getTemplate( "./src/main/resources/iteration_report_template.vm" );
         for (int i = 0; i < statisticsList.size() ; i++) {
             SimulatorStatistics statistics = statisticsList.get(i);
             VelocityContext context = new VelocityContext();
@@ -97,7 +97,7 @@ public class SimulationReports {
             context.put("JOIN", QueryType.JOIN);
             context.put("SELECT",QueryType.SELECT);
             StringWriter writer = new StringWriter();
-            indexTemplate.merge( context, writer );
+            iterationTemplate.merge( context, writer );
             String result = writer.toString();
             String path = "./src/statistics/iterations/iteration_"+(i+1)+".html";
             File file = new File(path);

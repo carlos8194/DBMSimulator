@@ -127,7 +127,7 @@ public class SimulatorStatistics {
      */
     public void processQueryReturn(Query query) {
         averageQueryLifeTime += query.getStatistics().getQueryLifeTime();
-        totalQueriesProcessed = getTotalQueriesProcessed() + 1;
+        totalQueriesProcessed = totalQueriesProcessed + 1;
     }
 
     /**

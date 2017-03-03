@@ -123,6 +123,7 @@ public class Simulator {
      * @param query: The object about to leave the system.
      */
     private void processQueryReturn(Query query) {
+        clientAdministrator.freeConnection();
         simulatorStatistics.processQueryReturn(query);
         eventList.remove(query.getTimeoutEvent());
     }
@@ -144,13 +145,16 @@ public class Simulator {
      * the next NEW_QUERY event, which is added to the queue, as well as the TIME_OUT event of the just created query.
      */
     private void processNewQuery() {
-        Query query = new Query();
-        Event queryTimeOut = new Event(EventType.QUERY_TIMEOUT, clock + queryTimeoutTime, query);
-        query.setTimeoutEvent(queryTimeOut);
-        Event nextArrival = new Event(EventType.NEW_QUERY, clock + ProbabilityDistributions.Exponential(35.0/60.0) );
-        eventList.add(nextArrival);
-        eventList.add(queryTimeOut);
-        clientAdministrator.processArrival(query);
+        if(clientAdministrator.getOccupiedServers()==concurrentConnections) this.incrementDiscardedConnections();
+        else {
+            Query query = new Query();
+            Event queryTimeOut = new Event(EventType.QUERY_TIMEOUT, clock + queryTimeoutTime, query);
+            query.setTimeoutEvent(queryTimeOut);
+            Event nextArrival = new Event(EventType.NEW_QUERY, clock + ProbabilityDistributions.Exponential(35.0 / 60.0));
+            eventList.add(nextArrival);
+            eventList.add(queryTimeOut);
+            clientAdministrator.processArrival(query);
+        }
     }
 
     /**
@@ -162,10 +166,10 @@ public class Simulator {
     }
 
     /**
-     * This method calls the SimulatorStatistics of this and tell it to increase by one the number of discarded
+     * This method calls the SimulatorStatistics of this and tells it to increase by one the number of discadted
      * connections.
      */
-    public void incrementDiscartedConnections()  {
+    public void incrementDiscardedConnections()  {
         simulatorStatistics.incrementDiscartedConnections();
     }
 

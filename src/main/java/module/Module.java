@@ -34,7 +34,7 @@ public abstract class Module {
 
         //Attend if posible.
         if (this.attendImmediately(query)) this.attendQuery(query);
-        else if(moduleNumber == 0) DBMS.incrementDiscartedConnections();
+        //else if(moduleNumber == 0) DBMS.incrementDiscardedConnections();
         else {
             //Lq: QueueSize change due to entry.
             this.recordQueueChange(query, ChangeType.ENTRY);
@@ -64,7 +64,6 @@ public abstract class Module {
         DBMS.addEvent(event);
         //Occupy Servers
         switch(moduleNumber){
-            //case 0: break;//??
             case 3: availableServers = (query.getQueryType() == QueryType.DDL) ? 0 : availableServers--;
                     break;
             default: availableServers--;
@@ -186,6 +185,8 @@ public abstract class Module {
         double timeChange = time - statistics.getServiceSizeChangeTime();
         double accumulatedServiceSize = statistics.getAccumulatedServiceSize();
         int currentServiceSize = moduleCapacity - availableServers;
+
+        if(currentServiceSize<0) System.out.println("negative service size,  modulo: "+ moduleNumber);
         statistics.setAccumulatedServiceSize(accumulatedServiceSize + (timeChange*currentServiceSize));
         statistics.setServiceSizeChangeTime(time);
 
