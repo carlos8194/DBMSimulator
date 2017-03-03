@@ -3,11 +3,17 @@ package dbms;
 import java.util.*;
 import interfaces.SimulationReports;
 
-public class Analisis {
+public class ReportsTest {
 
     public static void main(String[] args) {
-        int iterations = 15;
-        Simulator simulator = new Simulator(15000, 15, 3, 2, 1, 15);
+        int iterations = 10;
+        double totalRunningTime = 15000;
+        int k = 15;
+        int n = 3;
+        int p = 2;
+        int m = 1;
+        int t = 15;
+        Simulator simulator = new Simulator(totalRunningTime, k, n, p, m, t);
         List<SimulatorStatistics> statisticsList = new LinkedList<>();
         for (int i = 0; i < iterations; i++){
             simulator.initializeSimulation();
@@ -16,7 +22,7 @@ public class Analisis {
             }
             statisticsList.add(simulator.getSimulatorStatistics());
         }
-        SimulatorStatistics globalStatistics = new SimulatorStatistics(15000, 15, 3, 2, 1, 15, statisticsList);
+        SimulatorStatistics globalStatistics = new SimulatorStatistics(totalRunningTime, k, n, p, m, t, statisticsList);
         SimulationReports reports = new SimulationReports();
         try {
             reports.generateReports(globalStatistics);

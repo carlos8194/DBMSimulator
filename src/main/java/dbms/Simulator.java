@@ -125,6 +125,7 @@ public class Simulator {
     private void processQueryReturn(Query query) {
         clientAdministrator.freeConnection();
         simulatorStatistics.processQueryReturn(query);
+        clientAdministrator.freeConnection();
         eventList.remove(query.getTimeoutEvent());
     }
 

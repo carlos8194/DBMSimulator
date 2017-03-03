@@ -5,7 +5,7 @@ import module.Module;
 
 /**
  * This class implements the connections used in the simulation.
- * A query most importantly contains a QueryType, a timeout event and some statistics asociated to it.
+ * A query most importantly contains a QueryType, a timeout event and some statistics associated to it.
  * The timeout event is deleted if the query is able to go through all the modules before the timeout time.
  */
 public class Query implements Comparable<Query> {
