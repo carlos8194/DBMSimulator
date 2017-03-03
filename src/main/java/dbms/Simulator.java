@@ -127,7 +127,6 @@ public class Simulator {
     private void processQueryReturn(Query query) {
         clientAdministrator.freeConnection();
         simulatorStatistics.processQueryReturn(query);
-        clientAdministrator.freeConnection();
         query.setOutOfSystem(true);
     }
 
@@ -153,11 +152,12 @@ public class Simulator {
             Query query = new Query();
             Event queryTimeOut = new Event(EventType.QUERY_TIMEOUT, clock + queryTimeoutTime, query);
             query.setTimeoutEvent(queryTimeOut);
-            Event nextArrival = new Event(EventType.NEW_QUERY, clock + ProbabilityDistributions.Exponential(35.0 / 60.0));
-            eventList.add(nextArrival);
+
             eventList.add(queryTimeOut);
             clientAdministrator.processArrival(query);
         }
+        Event nextArrival = new Event(EventType.NEW_QUERY, clock + ProbabilityDistributions.Exponential(35.0 / 60.0));
+        eventList.add(nextArrival);
     }
 
     /**
@@ -169,10 +169,10 @@ public class Simulator {
     }
 
     /**
-     * This method calls the SimulatorStatistics of this and tells it to increase by one the number of discadted
+     * This method calls the SimulatorStatistics of this and tell it to increase by one the number of discarded
      * connections.
      */
-    public void incrementDiscardedConnections()  {
+    public void incrementDiscartedConnections()  {
         simulatorStatistics.incrementDiscartedConnections();
     }
 

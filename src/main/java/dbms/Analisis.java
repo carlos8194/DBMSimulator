@@ -6,7 +6,7 @@ import interfaces.SimulationReports;
 public class ReportsTest {
 
     public static void main(String[] args) {
-        int iterations = 10;
+        int iterations = 15;
         double totalRunningTime = 15000;
         int k = 15;
         int n = 3;
