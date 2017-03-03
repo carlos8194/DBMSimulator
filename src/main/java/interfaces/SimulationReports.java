@@ -1,7 +1,6 @@
 package interfaces;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.util.List;
 import dbms.SimulatorStatistics;
 
@@ -32,7 +31,7 @@ public class SimulationReports {
      * and calls to different methods to create the index and the individual reports.
      * It creates and  stores the statistics in the /src/statistics/ folder.
      * It obtains the templates from the /src/resources folder.
-     * @param globalStatistics the object conatining the simulation's statistics.
+     * @param globalStatistics the object containing the simulation's statistics.
      * @throws Exception if there is any problem creating the folder or reports.
      */
     public void generateReports(SimulatorStatistics globalStatistics) throws Exception {
@@ -78,7 +77,7 @@ public class SimulationReports {
 
     /**
      * This method creates each individual iteration statistics report. The individual report displays the global stadistics
-     * as well as the specific iteration report of perfomance measures.
+     * as well as the specific iteration report of performance measures.
      * It obtains a list with each simulation iteration run from the globalStatistics received as a parameter.
      * @param globalStatistics the object containing the simulation's statistics.
      * @param velocityEngine the template engine used to create the reports html pages.
