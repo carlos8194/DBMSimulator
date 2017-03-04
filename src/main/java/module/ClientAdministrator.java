@@ -45,6 +45,9 @@ public class ClientAdministrator extends Module {
             Event event = new Event(EventType.QUERY_RETURN, time, query);
             DBMS.addEvent(event);
         }
+        else{
+            DBMS.getSimulatorStatistics().incrementTotalTimeouts();
+        }
     }
 
     /**

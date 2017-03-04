@@ -98,6 +98,8 @@ public abstract class Module {
         if (!query.isTimeOut()) {
             if(moduleNumber == 4) ((ClientAdministrator)nextModule).returnQueryResult(query);
             else nextModule.processArrival(query);
+        }else{
+            DBMS.getSimulatorStatistics().incrementTotalTimeouts();
         }
     }
 

@@ -5,31 +5,30 @@ import interfaces.SimulationReports;
 
 public class Analisis {
 
-    public static void main(String[] args) {
-        int iterations = 15;
-        double totalRunningTime = 15000;
-        int k = 15;
-        int n = 3;
-        int p = 2;
-        int m = 1;
-        int t = 15;
-        Simulator simulator = new Simulator(totalRunningTime, k, n, p, m, t);
-        List<SimulatorStatistics> statisticsList = new LinkedList<>();
-        for (int i = 0; i < iterations; i++){
-            simulator.initializeSimulation();
-            while (!simulator.isSimulationOver()){
-                simulator.processNextEvent();
-            }
-            statisticsList.add(simulator.getSimulatorStatistics());
-        }
-        SimulatorStatistics globalStatistics = new SimulatorStatistics(totalRunningTime, k, n, p, m, t, statisticsList);
+    public static void main(String[] args) throws Exception {
+
+
+        //k,n,p,m
+        int[] config1 = {1,1,1,1};
+        double note1 = evaluateConfiguration(config1,15);
+        System.out.printf("Configuration: %d,%d,%d,%d,%ds, Note: %f",config1[0],config1[1],config1[2],config1[3],15, note1);
+
+    }
+
+    public static double evaluateConfiguration( int[] config,double timeout) throws Exception {
+        Simulator simulator = new Simulator(10000,config[0],config[1],config[2],config[3], timeout);
+        SimulatorStatistics statistics = simulator.runSimulation(15);
+        double averageArrivals = statistics.getAverageArrivals();
+        System.out.println(averageArrivals);
+        double queriesProcessedNote = (double) statistics.getAverageQueriesProcessed()/averageArrivals;
+        double queryLifetimeNote = 1.0-(statistics.getAverageQueryLifeTime() / 30);
+        double discartedConnectionsNote =1.0 -(statistics.getAverageDiscartedConnections()/averageArrivals);
+
         SimulationReports reports = new SimulationReports();
-        try {
-            reports.generateReports(globalStatistics);
-        } catch (Exception e1) {
-            e1.printStackTrace();
-            System.exit(1);
-        }
+        reports.generateReports(statistics);
+
+        System.out.println("notes: "+queriesProcessedNote+" "+queryLifetimeNote+" "+discartedConnectionsNote);
+        return 100*(0.4*queriesProcessedNote + 0.4*queryLifetimeNote + 0.2*discartedConnectionsNote);
     }
 
 }

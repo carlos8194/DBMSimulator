@@ -1,9 +1,12 @@
 package dbms;
 import event.*;
+import interfaces.SimulationReports;
 import module.*;
 import query.Query;
 import utils.ProbabilityDistributions;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.PriorityQueue;
 
 /**
@@ -113,6 +116,7 @@ public class Simulator {
      * @param query: The object whose time is over.
      */
     private void processQueryTimeout(Query query) {
+        simulatorStatistics.incrementTotalTimeouts();
         if (!query.isOutOfSystem()) {
             query.getCurrentModule().queryTimeout(query);
             clientAdministrator.freeConnection();
@@ -147,6 +151,7 @@ public class Simulator {
      * the next NEW_QUERY event, which is added to the queue, as well as the TIME_OUT event of the just created query.
      */
     private void processNewQuery() {
+        simulatorStatistics.incrementTotalArrivals();
         if(clientAdministrator.getOccupiedServers() == concurrentConnections) this.incrementDiscartedConnections();
         else {
             Query query = new Query();
@@ -233,5 +238,18 @@ public class Simulator {
      */
     public SimulatorStatistics getSimulatorStatistics() {
         return simulatorStatistics;
+    }
+
+    public SimulatorStatistics runSimulation(int iterations) {
+        List<SimulatorStatistics> statisticsList = new LinkedList<>();
+        for (int i = 0; i < iterations; i++){
+            this.initializeSimulation();
+            while (!this.isSimulationOver()){
+                this.processNextEvent();
+            }
+            statisticsList.add(this.simulatorStatistics);
+        }
+        SimulatorStatistics globalStatistics = new SimulatorStatistics(totalRunningTime, concurrentConnections, availableProcesses, simultaneousConsultations, parallelStatements, queryTimeoutTime, statisticsList);
+        return globalStatistics;
     }
 }

@@ -17,12 +17,15 @@ import java.util.List;
  */
 public class SimulatorStatistics {
     //General(Internal use)
+    private int totalArrivals;
+    private double averageArrivals;
     private int numberOfSelects;
     private int numberOfUpdates;
     private int numberOfJoins;
     private int numberOfDDls;
     private int totalQueriesProcessed;
     private double averageQueriesProcessed;
+
 
     //1.Simulator Parameters.
     private double time;
@@ -57,6 +60,8 @@ public class SimulatorStatistics {
 
     private int numberOfIterations;
     private List<SimulatorStatistics> statisticsList;
+    private int totalTimeouts;
+    private double averageTimeouts;
 
     /**
      * This class constructor is used when the object is intended to hold the dbms statistics of a specific iteration run.
@@ -267,6 +272,37 @@ public class SimulatorStatistics {
         return totalQueriesProcessed;
     }
 
+    /**
+     * When used as an individual iteration statistics class, returns the total amount of queries that arrived to the system, takes
+     * into account the rejected queries.
+     * @return totalArrivals
+     */
+    public int getTotalArrivals() {
+        return totalArrivals;
+    }
+
+    /**
+     * When used as an individual iteration statistics class, returns the total amount of queries that arrived to the system
+     */
+    public void incrementTotalArrivals() {
+        this.totalArrivals++;
+    }
+    /**
+     * When used as an individual iteration statistics class, returns the total amount of queries that were timedOut
+     * @return totalArrivals
+     */
+    public int getTotalTimeouts() {
+        return totalTimeouts;
+    }
+
+    /**
+     * When used as an individual iteration statistics class, returns the total amount of queries that arrived to the system
+     */
+    public void incrementTotalTimeouts() {
+        this.totalTimeouts++;
+    }
+
+
 
 
     //GlobalStatistics methods. Methods used when object is used for averaging all iterations statistics.
@@ -280,6 +316,8 @@ public class SimulatorStatistics {
 
         //Add all statistics.
         for (SimulatorStatistics statistic: statisticsList) {
+            totalTimeouts = totalTimeouts + statistic.getTotalTimeouts();
+            totalArrivals = totalArrivals + statistic.getTotalArrivals();
             averageQueryLifeTime = averageQueryLifeTime + statistic.getAverageQueryLifeTime();
             discartedConnections = discartedConnections + statistic.getNumberOfDiscartedConnections();
             totalQueriesProcessed = totalQueriesProcessed + statistic.getTotalQueriesProcessed();
@@ -299,6 +337,8 @@ public class SimulatorStatistics {
         }
 
         //Divide by number of iterations.
+        averageTimeouts = totalTimeouts/(double)numberOfIterations;
+        averageArrivals = totalArrivals/ (double)numberOfIterations;
         averageQueryLifeTime /= (double)numberOfIterations;
         averageDiscartedConnections = discartedConnections /(double) numberOfIterations;
         averageQueriesProcessed = totalQueriesProcessed /(double) numberOfIterations;
@@ -344,6 +384,20 @@ public class SimulatorStatistics {
      */
     public double getAverageQueriesProcessed() {
         return averageQueriesProcessed;
+    }
+    /**
+     * When used as a global statistics class, returns the average amount of queries that where timed out.
+     * @return averageTimeouts.
+     */
+    public double getAverageTimeouts() {
+        return averageTimeouts;
+    }
+    /**
+     * When used as a global statistics class, returns the average amount of arrivals to the system
+     * @return totalQueriesProcessed
+     */
+    public double getAverageArrivals() {
+        return averageArrivals;
     }
 
 
@@ -412,6 +466,7 @@ public class SimulatorStatistics {
      * @return t
      */
     public double getT() {return t;}
+
 
 
 
